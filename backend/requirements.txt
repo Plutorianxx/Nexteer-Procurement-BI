@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pandas
+duckdb
+python-multipart
+openpyxl
+openai
+pydantic
+pydantic-settings
