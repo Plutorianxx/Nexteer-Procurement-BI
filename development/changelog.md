@@ -5,6 +5,9 @@
 ## 未发布
 
 ### 12-02
+- `feat`: 开发前端上传页面，支持文件拖拽与进度显示
+- `feat`: 开发字段映射确认 Modal，支持置信度展示与手动修正
+- `feat`: 封装前端 API 服务与国际化工具，支持中英文切换
 - `feat`: DuckDB 表结构设计（sessions + procurement_records），支持数据持久化
 - `feat`: 实现 Session管理服务，支持去重检查与 Period 自动提取
 - `feat`: 实现 ETL 服务，支持数据清洗、类型转换、批量入库

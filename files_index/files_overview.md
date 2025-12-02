@@ -31,6 +31,13 @@
 ## Frontend (`/frontend`)
 - `src/App.tsx`: 主应用组件
 - `src/main.tsx`: 入口文件
+- `src/pages/Upload/index.tsx`: 上传页面主组件
+- `src/components/FileUploader.tsx`: 文件上传组件
+- `src/components/MappingModal.tsx`: 映射确认弹窗
+- `src/services/api.ts`: Axios 封装
+- `src/services/uploadService.ts`: 上传服务
+- `src/types/index.ts`: 类型定义
+- `src/utils/i18n.ts`: 国际化工具
 - `vite.config.ts`: Vite配置
 - `package.json`: 前端依赖
 
