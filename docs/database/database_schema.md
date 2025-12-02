@@ -1,47 +1,68 @@
-# 数据库设计
+# 数据库架构
 
 ## 概述
 
 ```
-数据库：[类型，如MySQL]
+数据库：DuckDB (OLAP、嵌入式)
+存储路径：backend/data/procurement.duckdb
 命名规范：表名小写复数，字段小写下划线
 ```
 
 ## 表结构
 
-### users 用户表
+### sessions 会话元数据表
 
 | 字段 | 类型 | 约束 | 说明 |
 |-----|------|------|------|
-| id | BIGINT | PK, AUTO | 主键 |
-| email | VARCHAR(100) | UNIQUE | 邮箱 |
-| password | VARCHAR(255) | NOT NULL | 密码(加密) |
-| name | VARCHAR(50) | | 姓名 |
-| created_at | TIMESTAMP | DEFAULT NOW | 创建时间 |
-| updated_at | TIMESTAMP | ON UPDATE | 更新时间 |
+| session_id | VARCHAR | PK | 会话唯一标识 (UUID) |
+| period | VARCHAR | | 数据期间（如 "2023"） |
+| upload_time | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | 上传时间 |
+| file_name | VARCHAR | | 文件名 |
+| file_hash | VARCHAR | UNIQUE | 文件 SHA256 哈希值（去重） |
+| total_rows | INTEGER | | 总行数 |
+| status | VARCHAR | DEFAULT 'pending' | 状态（pending/completed/failed） |
+| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | 创建时间 |
+| updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | 更新时间 |
 
-**索引**：email(唯一)
+**索引**：file_hash (唯一)
 
-### [表名] [说明]
+### procurement_records 采购记录表
 
 | 字段 | 类型 | 约束 | 说明 |
 |-----|------|------|------|
-| id | BIGINT | PK | 主键 |
-| [字段] | [类型] | [约束] | [说明] |
+| session_id | VARCHAR | PK (复合) | 关联的会话 ID |
+| pns | VARCHAR | PK (复合) | 零件号（主键） |
+| commodity | VARCHAR | | 品类 |
+| supplier | VARCHAR | | 供应商 |
+| quantity | DECIMAL(15,2) | | 数量 |
+| apv | DECIMAL(15,2) | | 年度采购额 (Annual Purchase Value) |
+| target_spend | DECIMAL(15,2) | | 目标支出 |
+| opportunity | DECIMAL(15,2) | | 机会金额 |
+| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | 创建时间 |
+
+**主键**：(session_id, pns)  
+**外键**：session_id → sessions.session_id
 
 ## 关系图
 
 ```
-users 1──┬──N orders
-         │
-         └──1 profiles
-
-orders N──M products (通过 order_items)
+sessions 1──────N procurement_records
+   │
+   └── file_hash (UNIQUE) 用于去重
 ```
 
-## 索引策略
+## 数据流
 
-| 表 | 索引 | 类型 | 用途 |
-|---|------|------|------|
-| users | email | UNIQUE | 登录查询 |
-| orders | user_id | INDEX | 用户订单 |
+```
+1. 用户上传 Excel → ExcelParser 解析 → 生成映射建议
+2. 用户确认映射 → 创建 Session (检查 file_hash)
+3. ETL 清洗数据 → 批量插入 procurement_records
+4. 更新 Session 状态为 completed
+```
+
+## Period 提取逻辑
+
+Period 从以下位置提取（优先级递减）：
+1. Excel 前 3 行单元格内容（正则 `20\d{2}`）
+2. 文件名（正则 `20\d{2}`）
+3. 默认当前年份

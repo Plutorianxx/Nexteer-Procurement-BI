@@ -1,9 +1,14 @@
 from fastapi import FastAPI
-from app.routers import upload
+from app.routers import upload, data
+from app.database.init import init_database
 
 app = FastAPI(title="Nexteer Procurement BI API", version="1.0.0")
 
+# 初始化数据库
+init_database()
+
 app.include_router(upload.router)
+app.include_router(data.router)
 
 @app.get("/")
 def read_root():

@@ -84,6 +84,71 @@
 - 400: 文件格式不支持
 - 500: 文件解析失败
 
+## 数据模块
+
+### POST /api/data/confirm 确认映射并入库
+**认证**：不需要  
+**描述**：用户确认字段映射后，执行数据清洗、Session 创建、批量入库
+
+| 参数 | 类型 | 必填 | 说明 |
+|-----|------|------|------|
+| file_hash | string | ✅ | 文件 SHA256 哈希值 |
+| file_name | string | ✅ | 文件名 |
+| mapping | array | ✅ | 映射关系列表 |
+| file_content_base64 | string | ✅ | Base64 编码的文件内容 |
+
+**响应**：
+```json
+{
+  "session_id": "uuid",
+  "period": "2023",
+  "inserted_rows": 100,
+  "status": "completed"
+}
+```
+
+**错误**：
+- 400: 文件重复上传
+- 500: ETL 处理失败
+
+### GET /api/data/sessions/{session_id} 获取 Session 信息
+**认证**：不需要
+
+**响应**：
+```json
+{
+  "session_id": "uuid",
+  "period": "2023",
+  "upload_time": "2025-12-02T14:00:00",
+  "file_name": "sample.xlsx",
+  "file_hash": "sha256...",
+  "total_rows": 100,
+  "status": "completed"
+}
+```
+
+### GET /api/data/records/{session_id} 查询采购记录
+**认证**：不需要
+
+**响应**：
+```json
+{
+  "session_id": "uuid",
+  "records": [
+    {
+      "pns": "A123",
+      "commodity": "电子元器件",
+      "supplier": "Supplier A",
+      "quantity": 100.0,
+      "apv": 1000.0,
+      "target_spend": 900.0,
+      "opportunity": 100.0
+    }
+  ],
+  "total": 100
+}
+```
+
 ## 错误码
 
 | 错误码 | HTTP状态 | 说明 |

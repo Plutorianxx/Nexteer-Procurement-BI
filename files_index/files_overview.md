@@ -13,10 +13,17 @@
 ## Backend (`/backend`)
 - `app/main.py`: API 入口
 - `app/routers/upload.py`: 文件上传路由
+- `app/routers/data.py`: 数据确认与查询路由
 - `app/services/excel_parser.py`: Excel 解析服务
+- `app/services/session_manager.py`: Session 管理服务
+- `app/services/etl_service.py`: ETL 数据清洗与入库服务
 - `app/schemas/upload.py`: 上传响应模型
+- `app/schemas/data.py`: 数据确认模型
+- `app/database/init.py`: DuckDB 初始化与连接
 - `tests/create_mock.py`: 测试数据生成脚本
+- `tests/create_payload.py`: 测试请求生成脚本
 - `tests/mock_data.xlsx`: 测试用 Excel 文件
+- `data/procurement.duckdb`: DuckD B 数据库文件
 - `Dockerfile`: 后端镜像构建
 - `requirements.txt`: Python依赖
 - `venv/`: Python 虚拟环境

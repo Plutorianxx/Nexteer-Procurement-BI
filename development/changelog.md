@@ -5,6 +5,11 @@
 ## 未发布
 
 ### 12-02
+- `feat`: DuckDB 表结构设计（sessions + procurement_records），支持数据持久化
+- `feat`: 实现 Session管理服务，支持去重检查与 Period 自动提取
+- `feat`: 实现 ETL 服务，支持数据清洗、类型转换、批量入库
+- `feat`: 新增 `/api/data/confirm` 接口，完成映射确认与数据入库流程
+- `feat`: 新增 `/api/data/records/{session_id}` 查询接口
 - `feat`: 实现 Excel/CSV 上传解析接口，支持智能字段映射（同义词+模糊匹配）
 - `feat`: 创建后端核心服务 ExcelParser，支持 Hash 校验与数据预览
 

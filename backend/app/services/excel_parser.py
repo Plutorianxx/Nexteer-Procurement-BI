@@ -44,7 +44,20 @@ class ExcelParser:
         if filename.endswith('.csv'):
             df = pd.read_csv(io.BytesIO(file_content))
         else:
-            df = pd.read_excel(io.BytesIO(file_content))
+            # 读取 Excel，先不指定 header
+            df_raw = pd.read_excel(io.BytesIO(file_content), header=None)
+            
+            # 检测实际表头位置：查找包含 "PNs" 或其他关键字段的行
+            header_row_idx = 0
+            for idx, row in df_raw.iterrows():
+                # 如果该行包含多个标准字段名（或同义词），则为表头
+                row_str = ' '.join(row.astype(str).tolist()).lower()
+                if any(field in row_str for field in ['pns', 'qty', 'supplier', 'commodity']):
+                    header_row_idx = idx
+                    break
+            
+            # 使用检测到的表头重新读取
+            df = pd.read_excel(io.BytesIO(file_content), header=header_row_idx)
         
         # 2. 基础清洗
         df = df.fillna("")  # 填充空值
