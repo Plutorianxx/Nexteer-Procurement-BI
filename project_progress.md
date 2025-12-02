@@ -8,11 +8,16 @@
 项目：零部件采购成本与机会分析系统 (PCO-BI)
 版本：v0.1.0
 阶段：[ ] 规划 / [x] 开发 / [ ] 测试 / [ ] 已发布
-进度：30%
-更新：2025-12-02 16:20
+进度：40%
+更新：2025-12-03 01:10
 ```
 
 ## 最近完成（保留最近5轮）
+
+### 12-03 - 基础 BI 面板 (Phase 1)
+**完成**：开发 Commodity Assessment Overview 页面，实现 6 大 KPI、品类双轴图、Top 20 榜单
+**文件**：`backend/app/services/analytics_service.py`, `frontend/src/pages/Dashboard/`
+**备注**：已实现上传后自动跳转至 Dashboard
 
 ### 12-02 - 数据模型扩展
 **完成**：扩展数据库字段（PartDesc, Price, Gap等），支持正则匹配动态表头

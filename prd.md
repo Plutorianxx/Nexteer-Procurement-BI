@@ -38,6 +38,76 @@
 | **供应商详情页** | 供应商画像、What-If 模拟沙箱 | 需包含交互式输入框用于模拟报价 |
 | **系统设置页** | LLM模型配置(Key/Url)、Prompt模板管理 | 表单式页面 |
 
+## 4. 功能需求 (Functional Requirements)
+
+### 4.1 数据上传与处理 (Data Ingestion)
+- **文件支持**: Excel (.xlsx), CSV (.csv)
+- **智能映射**:
+  - 自动识别表头并映射到标准字段 (PNs, Quantity, APV, Opportunity 等)
+  - 支持动态表头识别 (如 "2023 quantity" -> Quantity)
+  - 映射置信度提示与人工修正界面
+- **数据清洗**: 自动去除货币符号、百分号，处理空值
+
+### 4.2 基础 BI 面板 (Basic BI Dashboard)
+
+#### A. 总览页 (Commodity Assessment Overview)
+**1. 核心 KPI 卡片**
+- **Total Spending**: 所有记录的 APV 总和
+- **Spending Covered**: Covered APV 总和
+- **PNs Covered**: 唯一 PNs 数量
+- **Suppliers Covered**: 唯一 Supplier 数量
+- **Gap/Opportunity Identified**: Gap to Target pc cost 汇总
+- **Gap % of APV**: (Total Opportunity / Total APV) %
+
+**2. 品类全景 (Commodity Overview)**
+- **图表**: 双轴图
+  - 主轴 (柱状): APV $ vs Covered Spending $
+  - 副轴 (折线): Gap in %
+  - 维度: 按 Commodity 类型分组
+- **数据表**: 包含 APV, Covered Spending, Covered PNs, Opportunity, Gap %, No. of Suppliers
+- **Top 20 Lists**:
+  - **Suppliers**: 按 Opportunity 排序，展示 APV, Gap%, 主营 Commodity
+  - **Projects (PNs)**: 按 Opportunity 排序，展示 PNs, Part Description, APV, Gap%, Supplier
+
+#### B. 品类详情页 (Commodity Detail Page)
+*为每个 Commodity 类型提供独立视图*
+
+**1. 局部总览**
+- 复用总览页 KPI 逻辑，但数据范围仅限于当前 Commodity
+
+**2. Top 5 Suppliers 分析**
+- **图表**: 
+  - 柱状: APV $ vs Opportunity $ (按 Opportunity 降序排列)
+  - 折线: Gap in % (副轴)
+
+**3. 供应商深度分析 (Top 5 Suppliers Detail)**
+- **交互式图表**: 默认展示 APV 和 Opportunity，支持用户**手动添加数据系列** (如输入新数值，实时生成对比柱状图)
+- **Top 10 PNs 表**: 该供应商名下 Opportunity 最大的 10 个零件 (PNs, Description, Opportunity, Gap%)
+
+### 4.3 高级数据分析 (Advanced Analytics)
+
+#### A. 象限分析 (Opportunity Matrix) - **必做**
+- **图表类型**: 气泡图 (Bubble Chart)
+- **X轴**: APV $ (采购额，代表重要性)
+- **Y轴**: Gap in % (降本空间，代表潜力)
+- **气泡大小**: Annual Opportunity $
+- **业务价值**: 识别"现金牛"(优先攻坚)、"难啃骨头"和"长尾零件"
+
+#### B. 供应商集中度 (Supplier Concentration) - **必做**
+- **指标**: CR3, CR5 (Top Suppliers 份额占比)
+- **业务价值**: 识别单一来源 (Single Source) 风险，辅助供应链安全决策
+
+#### C. 后续规划 (V2)
+- **价格离散度 (Price Benchmarking)**: 基于 Part Description 聚类，对比相似零件单价
+- **长尾分析 (Tail Spend Analysis)**: 统计后 80% 供应商/零件的支出占比，辅助 VMI 决策
+
+### 4.4 LLM 智能分析 (AI Insights)
+- **覆盖范围**: 所有页面 (总览、品类详情、供应商详情)
+- **功能**:
+  - 上下文感知：自动获取当前页面的统计数据作为 Context
+  - 模板选择：提供预设 Prompt (如"降本策略建议", "风险评估")
+  - 报告生成：输出 Markdown 格式的分析报告
+
 ## 5. 数据需求
 
 | 数据 | 关键字段 | 来源 |
