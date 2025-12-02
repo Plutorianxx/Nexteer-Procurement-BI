@@ -57,6 +57,61 @@ class ETLService:
             if field in df_cleaned.columns:
                 df_cleaned[field] = df_cleaned[field].astype(str).str.strip()
         
+        # 按 PNs 和 Supplier 聚合 (解决主键冲突，同时保留双源采购)
+        if "pns" in df_cleaned.columns and "supplier" in df_cleaned.columns:
+            # 1. 定义基础聚合规则
+            agg_dict = {}
+            for col in df_cleaned.columns:
+                if col in ["pns", "supplier"]: continue
+                if col in ["price", "gap_percent", "gappercent", "gap_to_target", "gaptotarget"]:
+                    continue # 这些字段需要特殊计算
+                
+                if col in numeric_fields:
+                    agg_dict[col] = "sum"
+                else:
+                    agg_dict[col] = "first"
+            
+            # 2. 执行基础聚合
+            # 按 pns 和 supplier 联合分组，保留双源采购记录
+            df_grouped = df_cleaned.groupby(["pns", "supplier"], as_index=False).agg(agg_dict)
+            
+            # 3. 计算加权平均字段 (Price, Gap%)
+            # 为了计算加权，我们需要原始数据的分组对象
+            grouped = df_cleaned.groupby(["pns", "supplier"])
+            
+            def calculate_weighted_metrics(group):
+                total_qty = group["quantity"].sum() if "quantity" in group else 0
+                total_apv = group["apv"].sum() if "apv" in group else 0
+                
+                metrics = {}
+                
+                # 计算加权单价 (Total APV / Total Qty)
+                if "price" in group.columns:
+                    if total_qty > 0:
+                        metrics["price"] = total_apv / total_qty
+                    else:
+                        metrics["price"] = group["price"].mean()
+                
+                # 计算加权 Gap % (Total Opportunity / Total APV)
+                # 注意：这里假设 gap_percent 是小数 (0.1) 还是百分比 (10) 需要统一。目前代码里是去除 % 后转数字。
+                if "gappercent" in group.columns:
+                    total_opp = group["opportunity"].sum() if "opportunity" in group else 0
+                    if total_apv > 0:
+                        metrics["gappercent"] = (total_opp / total_apv) * 100
+                    else:
+                        metrics["gappercent"] = group["gappercent"].mean()
+                
+                return pd.Series(metrics)
+
+            # 只有当存在需要加权的字段时才计算
+            if any(col in df_cleaned.columns for col in ["price", "gappercent"]):
+                weighted_metrics = grouped.apply(calculate_weighted_metrics).reset_index()
+                # 合并回主表
+                df_grouped = pd.merge(df_grouped, weighted_metrics, on=["pns", "supplier"], how="left")
+            
+            df_cleaned = df_grouped
+        
+        print(f"ETL Summary: Input rows={len(df)}, Output rows={len(df_cleaned)}")
         return df_cleaned
     
     def insert_records(self, session_id: str, df: pd.DataFrame) -> int:

@@ -50,8 +50,9 @@ export const CommodityChart: React.FC<Props> = ({ data }) => {
                     type: 'value',
                     name: 'Gap %',
                     min: 0,
-                    max: 100,
-                    axisLabel: { formatter: '{value} %' }
+                    // max: 100, // 移除固定最大值，让其自适应
+                    axisLabel: { formatter: '{value} %' },
+                    splitLine: { show: false } // 隐藏副轴网格线，保持整洁
                 }
             ],
             series: [
@@ -59,21 +60,23 @@ export const CommodityChart: React.FC<Props> = ({ data }) => {
                     name: 'Total APV',
                     type: 'bar',
                     data: data.map(item => item.total_apv),
-                    itemStyle: { color: '#2D2D2D' }
+                    itemStyle: { color: '#1A1A1A' } // 品牌黑
                 },
                 {
                     name: 'Covered APV',
                     type: 'bar',
                     data: data.map(item => item.covered_apv),
-                    itemStyle: { color: '#9E9E9E' } // 灰色表示已覆盖
+                    itemStyle: { color: '#595959' } // 深灰，增加对比度
                 },
                 {
                     name: 'Gap %',
                     type: 'line',
                     yAxisIndex: 1,
                     data: data.map(item => item.gap_percent),
-                    itemStyle: { color: '#E31837' },
-                    lineStyle: { width: 3 }
+                    itemStyle: { color: '#E31837' }, // 品牌红
+                    lineStyle: { width: 3 },
+                    symbol: 'circle',
+                    symbolSize: 6
                 }
             ]
         };

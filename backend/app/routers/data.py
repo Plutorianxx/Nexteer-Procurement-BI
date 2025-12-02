@@ -27,13 +27,8 @@ async def confirm_mapping(request: ConfirmMappingRequest):
     6. 更新 Session 状态
     """
     try:
-        # 1. 检查去重
-        existing_session = session_mgr.check_duplicate(request.file_hash)
-        if existing_session:
-            raise HTTPException(
-                status_code=400,
-                detail=f"File already uploaded. Session ID: {existing_session}"
-            )
+        # 1. 检查去重 (已移除，允许重复上传)
+        # existing_session_id = session_mgr.check_duplicate(request.file_hash)
         
         # 2. 使用 ExcelParser 解析文件（自动处理表头检测）
         file_content = base64.b64decode(request.file_content_base64)

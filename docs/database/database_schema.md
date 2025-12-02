@@ -44,10 +44,10 @@
 | target_spend | DECIMAL(15,2) | | 目标支出 |
 | gap_to_target | DECIMAL(15,2) | | 单价差异 |
 | opportunity | DECIMAL(15,2) | | 机会金额 |
-| gap_percent | DECIMAL(5,2) | | 差异百分比 |
-| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | 创建时间 |
+| gap_percent | DECIMAL(5,2) | Gap % | 差异百分比 |
+| created_at | TIMESTAMP | | 创建时间 |
 
-**主键**：(session_id, pns)  
+**主键**：`(session_id, pns, supplier)` (支持同一零件由多个供应商供应)  
 **外键**：session_id → sessions.session_id
 
 ## 关系图

@@ -22,7 +22,7 @@ def init_database():
             period VARCHAR,
             upload_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             file_name VARCHAR,
-            file_hash VARCHAR UNIQUE,
+            file_hash VARCHAR,
             total_rows INTEGER,
             status VARCHAR DEFAULT 'pending',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -49,7 +49,7 @@ def init_database():
             opportunity DECIMAL(15,2),
             gap_percent DECIMAL(5,2),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (session_id, pns)
+            PRIMARY KEY (session_id, pns, supplier)
         )
     """)
     

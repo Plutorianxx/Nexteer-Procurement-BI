@@ -5,8 +5,10 @@
 ## 未发布
 
 ### 12-02
-- `feat`: 开发基础 BI 面板，展示 KPI、品类全景图与 Top 20 榜单
-- `feat`: 实现 Analytics Service，支持多维度聚合查询 (DuckDB)
+- `fix`: 修复 Excel 表头检测逻辑，防止数据丢失
+- `fix`: 调整数据聚合逻辑，支持双源采购 (PNs + Supplier)，解决主键冲突
+- `fix`: 优化 Suppliers Covered 统计逻辑，忽略大小写差异
+- `style`: 优化 Commodity Chart 样式，移除 Y 轴强制限制
 - `feat`: 扩展数据模型，新增 PartDesc/Price/Gap 等7个关键字段
 - `feat`: 增强 Excel 解析器，支持正则匹配动态表头（如 "2023 quantity"）
 - `feat`: 开发前端上传页面，支持文件拖拽与进度显示

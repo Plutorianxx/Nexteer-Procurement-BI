@@ -14,10 +14,10 @@
 
 ## 最近完成（保留最近5轮）
 
-### 12-03 - 基础 BI 面板 (Phase 1)
-**完成**：开发 Commodity Assessment Overview 页面，实现 6 大 KPI、品类双轴图、Top 20 榜单
-**文件**：`backend/app/services/analytics_service.py`, `frontend/src/pages/Dashboard/`
-**备注**：已实现上传后自动跳转至 Dashboard
+### 12-03 - 基础 BI 面板 (Phase 1) - 完成
+**完成**：Dashboard 上线，修复数据聚合逻辑（支持双源采购），优化 Excel 解析
+**文件**：`backend/app/services/`, `backend/app/database/`, `frontend/src/pages/Dashboard/`
+**备注**：数据准确性已验证，主键调整为 (session_id, pns, supplier)
 
 ### 12-02 - 数据模型扩展
 **完成**：扩展数据库字段（PartDesc, Price, Gap等），支持正则匹配动态表头

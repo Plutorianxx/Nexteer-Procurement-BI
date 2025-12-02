@@ -57,14 +57,25 @@ class ExcelParser:
             # 读取 Excel，先不指定 header
             df_raw = pd.read_excel(io.BytesIO(file_content), header=None)
             
-            # 检测实际表头位置：查找包含 "PNs" 或其他关键字段的行
+            # 检测实际表头位置：只扫描前 50 行
             header_row_idx = 0
-            for idx, row in df_raw.iterrows():
-                # 如果该行包含多个标准字段名（或同义词），则为表头
+            found_header = False
+            # 关键字段列表，必须匹配其中至少 2 个
+            key_fields = ['pns', 'qty', 'quantity', 'supplier', 'commodity', 'apv', 'price']
+            
+            for idx, row in df_raw.head(50).iterrows():
                 row_str = ' '.join(row.astype(str).tolist()).lower()
-                if any(field in row_str for field in ['pns', 'qty', 'supplier', 'commodity']):
+                # 计算匹配到的关键字段数量
+                match_count = sum(1 for field in key_fields if field in row_str)
+                
+                if match_count >= 2:
                     header_row_idx = idx
+                    found_header = True
                     break
+            
+            # 如果没找到，默认第0行
+            if not found_header:
+                header_row_idx = 0
             
             # 使用检测到的表头重新读取
             df = pd.read_excel(io.BytesIO(file_content), header=header_row_idx)
