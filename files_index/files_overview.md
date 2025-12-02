@@ -39,6 +39,9 @@
 - `src/components/CommodityChart.tsx`: 品类双轴图组件
 - `src/services/api.ts`: Axios 封装
 - `src/services/uploadService.ts`: 上传服务
+- `src/pages/CommodityDetail/index.tsx`: 品类详情页
+- `src/components/TopSuppliersChart.tsx`: Top Suppliers 双轴图
+- `src/components/SupplierDetailCard.tsx`: 交互式 Supplier 详情卡片
 - `src/services/analyticsService.ts`: 分析服务
 - `src/types/index.ts`: 基础类型定义
 - `src/types/analytics.ts`: 分析类型定义

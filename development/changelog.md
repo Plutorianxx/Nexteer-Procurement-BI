@@ -5,7 +5,10 @@
 ## 未发布
 
 ### 12-02
-- `fix`: 修复 Excel 表头检测逻辑，防止数据丢失
+- `feat`: 开发 Commodity Detail Page，支持独立分析和交互式图表
+- `feat`: 实现 Top Suppliers 双轴图（柱状 + 折线）
+- `feat`: 开发交互式 Supplier Detail Card，支持用户自定义数据系列
+- `feat`: 在 Commodity Chart 上添加点击跳转到详情页功能
 - `fix`: 调整数据聚合逻辑，支持双源采购 (PNs + Supplier)，解决主键冲突
 - `fix`: 优化 Suppliers Covered 统计逻辑，忽略大小写差异
 - `style`: 优化 Commodity Chart 样式，移除 Y 轴强制限制

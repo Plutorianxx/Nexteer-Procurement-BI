@@ -156,6 +156,61 @@
 }
 ```
 
+## Analytics 模块
+
+### GET /api/analytics/commodity/{session_id}/{commodity:path}/kpi 获取指定 Commodity 的 KPI
+**认证**：不需要
+
+**说明**：commodity 参数支持包含斜杠的名称（如 "E -C/P/M"）
+
+**响应**：
+```json
+{
+  "total_spending": 50000.0,
+  "spending_covered": 45000.0,
+  "pns_covered": 120,
+  "suppliers_covered": 8,
+  "total_opportunity": 2500.0,
+  "gap_percent": 5.0
+}
+```
+
+### GET /api/analytics/commodity/{session_id}/{commodity:path}/top-suppliers 获取指定 Commodity 的 Top Suppliers
+**认证**：不需要
+
+**参数**：
+- `limit` (query, optional): 返回数量，默认 5
+
+**响应**：
+```json
+[
+  {
+    "supplier": "Supplier A",
+    "total_apv": 30000.0,
+    "total_opportunity": 1500.0,
+    "gap_percent": 5.0
+  }
+]
+```
+
+### GET /api/analytics/supplier/{session_id}/{supplier:path}/top-pns 获取指定 Supplier 的 Top PNs
+**认证**：不需要
+
+**参数**：
+- `limit` (query, optional): 返回数量，默认 10
+
+**响应**：
+```json
+[
+  {
+    "pns": "A123",
+    "part_desc": "Controller Asm",
+    "opportunity": 500.0,
+    "gap_percent": 10.0
+  }
+]
+```
+
 ## 错误码
 
 | 错误码 | HTTP状态 | 说明 |

@@ -1,17 +1,19 @@
 import React, { useEffect, useRef } from 'react';
 import * as echarts from 'echarts';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import type { CommodityData } from '../types/analytics';
 
-interface Props {
-    data: CommodityData[];
+interface SupplierData {
+    supplier: string;
+    total_apv: number;
+    total_opportunity: number;
+    gap_percent: number;
 }
 
-export const CommodityChart: React.FC<Props> = ({ data }) => {
+interface Props {
+    data: SupplierData[];
+}
+
+export const TopSuppliersChart: React.FC<Props> = ({ data }) => {
     const chartRef = useRef<HTMLDivElement>(null);
-    const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
-    const sessionId = searchParams.get('session_id');
 
     useEffect(() => {
         if (!chartRef.current || !data.length) return;
@@ -21,10 +23,10 @@ export const CommodityChart: React.FC<Props> = ({ data }) => {
         const option = {
             tooltip: {
                 trigger: 'axis',
-                axisPointer: { type: 'shadow' }
+                axisPointer: { type: 'cross' }
             },
             legend: {
-                data: ['Total APV', 'Covered APV', 'Gap %'],
+                data: ['APV $', 'Opportunity $', 'Gap %'],
                 bottom: 0
             },
             grid: {
@@ -35,7 +37,7 @@ export const CommodityChart: React.FC<Props> = ({ data }) => {
             },
             xAxis: {
                 type: 'category',
-                data: data.map(item => item.commodity),
+                data: data.map(item => item.supplier),
                 axisLabel: { interval: 0, rotate: 30 }
             },
             yAxis: [
@@ -60,23 +62,23 @@ export const CommodityChart: React.FC<Props> = ({ data }) => {
             ],
             series: [
                 {
-                    name: 'Total APV',
+                    name: 'APV $',
                     type: 'bar',
                     data: data.map(item => item.total_apv),
                     itemStyle: { color: '#1A1A1A' }
                 },
                 {
-                    name: 'Covered APV',
+                    name: 'Opportunity $',
                     type: 'bar',
-                    data: data.map(item => item.covered_apv),
-                    itemStyle: { color: '#595959' }
+                    data: data.map(item => item.total_opportunity),
+                    itemStyle: { color: '#E31837' }
                 },
                 {
                     name: 'Gap %',
                     type: 'line',
                     yAxisIndex: 1,
                     data: data.map(item => item.gap_percent),
-                    itemStyle: { color: '#E31837' },
+                    itemStyle: { color: '#2196F3' },
                     lineStyle: { width: 3 },
                     symbol: 'circle',
                     symbolSize: 6
@@ -86,16 +88,6 @@ export const CommodityChart: React.FC<Props> = ({ data }) => {
 
         chart.setOption(option);
 
-        // 添加点击事件，跳转到 Commodity Detail 页面
-        chart.on('click', (params: any) => {
-            if (params.componentType === 'series' && sessionId) {
-                const commodityName = data[params.dataIndex]?.commodity;
-                if (commodityName) {
-                    navigate(`/commodity/${encodeURIComponent(commodityName)}?session_id=${sessionId}`);
-                }
-            }
-        });
-
         const handleResize = () => chart.resize();
         window.addEventListener('resize', handleResize);
 
@@ -103,7 +95,7 @@ export const CommodityChart: React.FC<Props> = ({ data }) => {
             window.removeEventListener('resize', handleResize);
             chart.dispose();
         };
-    }, [data, navigate, sessionId]);
+    }, [data]);
 
     return <div ref={chartRef} style={{ width: '100%', height: 400 }} />;
 };

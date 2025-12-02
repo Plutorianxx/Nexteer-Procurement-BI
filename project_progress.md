@@ -14,6 +14,11 @@
 
 ## 最近完成（保留最近5轮）
 
+### 12-03 - Commodity Detail Page (品类详情页) - 完成
+**完成**：开发 Corn Commodity 独立视图，包括 KPI、Top 5 Suppliers 图表、交互式数据系列、Top 10 PNs 表
+**文件**：`backend/app/services/analytics_service.py`,`backend/app/routers/analytics.py`, `frontend/src/pages/CommodityDetail/`, `frontend/src/components/TopSuppliersChart.tsx`, `frontend/src/components/SupplierDetailCard.tsx`
+**备注**：支持从 Dashboard 点击 Commodity 跳转，支持用户自定义数据系列
+
 ### 12-03 - 基础 BI 面板 (Phase 1) - 完成
 **完成**：Dashboard 上线，修复数据聚合逻辑（支持双源采购），优化 Excel 解析
 **文件**：`backend/app/services/`, `backend/app/database/`, `frontend/src/pages/Dashboard/`

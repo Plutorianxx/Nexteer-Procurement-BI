@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { UploadPage } from './pages/Upload';
 import { Dashboard } from './pages/Dashboard';
+import { CommodityDetail } from './pages/CommodityDetail';
 import './App.css';
 
 function App() {
@@ -10,6 +11,7 @@ function App() {
         <Route path="/" element={<Navigate to="/upload" replace />} />
         <Route path="/upload" element={<UploadPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/commodity/:commodityName" element={<CommodityDetail />} />
       </Routes>
     </BrowserRouter>
   );

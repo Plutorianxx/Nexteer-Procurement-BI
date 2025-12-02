@@ -32,6 +32,12 @@
 - `backend/app/routers/data.py`: 移除去重检查代码
 **教训**：去重逻辑需根据业务需求设计，BI 系统通常允许重复分析
 
+### BUG-004: Commodity 名称包含斜杠导致路由 404 ✅
+**原因**：FastAPI 默认路径参数不支持包含 `/` 的值，导致 `E -C/P/M` 等名称被错误解析为多个路径段
+**修复**：
+- `backend/app/routers/analytics.py`: 路径参数改为 `{commodity:path}` 和 `{supplier:path}`
+**教训**：对于可能包含特殊字符的参数（如用户输入的名称），应使用 `:path` 类型或进行额外的 URL 编码处理
+
 ---
 
 <details>

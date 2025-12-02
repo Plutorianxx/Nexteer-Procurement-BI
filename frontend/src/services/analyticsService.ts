@@ -16,5 +16,17 @@ export const analyticsService = {
 
     getTopProjects: async (sessionId: string, limit: number = 20): Promise<ProjectRank[]> => {
         return api.get(`/analytics/top/projects/${sessionId}`, { params: { limit } });
+    },
+
+    getCommodityKPI: async (sessionId: string, commodity: string): Promise<KPISummary> => {
+        return api.get(`/analytics/commodity/${sessionId}/${encodeURIComponent(commodity)}/kpi`);
+    },
+
+    getCommodityTopSuppliers: async (sessionId: string, commodity: string, limit: number = 5) => {
+        return api.get(`/analytics/commodity/${sessionId}/${encodeURIComponent(commodity)}/top-suppliers`, { params: { limit } });
+    },
+
+    getSupplierTopPNs: async (sessionId: string, supplier: string, limit: number = 10) => {
+        return api.get(`/analytics/supplier/${sessionId}/${encodeURIComponent(supplier)}/top-pns`, { params: { limit } });
     }
 };

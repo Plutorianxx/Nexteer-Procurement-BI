@@ -54,7 +54,7 @@ class AnalyticsService:
         FROM procurement_records
         WHERE session_id = ?
         GROUP BY commodity
-        ORDER BY total_opportunity DESC
+        ORDER BY total_apv DESC
         """
         results = self.conn.execute(query, [session_id]).fetchall()
         
@@ -132,6 +132,93 @@ class AnalyticsService:
                 "apv": float(row[3] or 0),
                 "opportunity": float(row[4] or 0),
                 "gap_percent": float(row[5] or 0)
+            }
+            for row in results
+        ]
+
+    def get_commodity_kpi(self, session_id: str, commodity: str) -> Dict[str, Any]:
+        """
+        获取指定 Commodity 的 KPI 汇总
+        """
+        query = """
+        SELECT 
+            SUM(apv) as total_spending,
+            SUM(covered_apv) as spending_covered,
+            COUNT(DISTINCT CASE WHEN covered_apv > 0 THEN pns END) as pns_covered,
+            COUNT(DISTINCT CASE WHEN covered_apv > 0 THEN supplier END) as suppliers_covered,
+            SUM(opportunity) as total_opportunity,
+            CASE 
+                WHEN SUM(apv) > 0 THEN (SUM(opportunity) / SUM(apv)) * 100 
+                ELSE 0 
+            END as gap_percent
+        FROM procurement_records
+        WHERE session_id = ? AND commodity = ?
+        """
+        result = self.conn.execute(query, [session_id, commodity]).fetchone()
+        
+        return {
+            "total_spending": float(result[0] or 0),
+            "spending_covered": float(result[1] or 0),
+            "pns_covered": int(result[2] or 0),
+            "suppliers_covered": int(result[3] or 0),
+            "total_opportunity": float(result[4] or 0),
+            "gap_percent": float(result[5] or 0)
+        }
+
+    def get_commodity_top_suppliers(self, session_id: str, commodity: str, limit: int = 5) -> List[Dict[str, Any]]:
+        """
+        获取指定 Commodity 的 Top Suppliers (按 Opportunity 排序)
+        """
+        query = """
+        SELECT 
+            supplier,
+            SUM(apv) as total_apv,
+            SUM(opportunity) as total_opportunity,
+            CASE 
+                WHEN SUM(apv) > 0 THEN (SUM(opportunity) / SUM(apv)) * 100 
+                ELSE 0 
+            END as gap_percent
+        FROM procurement_records
+        WHERE session_id = ? AND commodity = ?
+        GROUP BY supplier
+        ORDER BY total_opportunity DESC
+        LIMIT ?
+        """
+        results = self.conn.execute(query, [session_id, commodity, limit]).fetchall()
+        
+        return [
+            {
+                "supplier": row[0],
+                "total_apv": float(row[1] or 0),
+                "total_opportunity": float(row[2] or 0),
+                "gap_percent": float(row[3] or 0)
+            }
+            for row in results
+        ]
+
+    def get_supplier_top_pns(self, session_id: str, supplier: str, limit: int = 10) -> List[Dict[str, Any]]:
+        """
+        获取指定 Supplier 的 Top PNs (按 Opportunity 排序)
+        """
+        query = """
+        SELECT 
+            pns,
+            part_desc,
+            opportunity,
+            gap_percent
+        FROM procurement_records
+        WHERE session_id = ? AND supplier = ?
+        ORDER BY opportunity DESC
+        LIMIT ?
+        """
+        results = self.conn.execute(query, [session_id, supplier, limit]).fetchall()
+        
+        return [
+            {
+                "pns": row[0],
+                "part_desc": row[1],
+                "opportunity": float(row[2] or 0),
+                "gap_percent": float(row[3] or 0)
             }
             for row in results
         ]
