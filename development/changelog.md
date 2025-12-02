@@ -4,9 +4,13 @@
 
 ## 未发布
 
-### [MM-DD]
-- `feat`: [描述]
-- `fix`: [描述]
+### 12-02
+- `feat`: 实现 Excel/CSV 上传解析接口，支持智能字段映射（同义词+模糊匹配）
+- `feat`: 创建后端核心服务 ExcelParser，支持 Hash 校验与数据预览
+
+### 12-01
+- `feat`: 项目初始化，搭建 React + FastAPI + Docker 开发环境
+- `chore`: Git 仓库初始化并推送至远程
 
 ## [v1.0.0] - [YYYY-MM-DD]
 

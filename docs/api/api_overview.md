@@ -49,16 +49,40 @@
 |-----|------|------|
 | name | string | 姓名 |
 
-## [模块名]
+## 上传模块
 
-### [METHOD] [路径] [说明]
-**认证**：需要/不需要
+### POST /api/upload/ 上传 Excel/CSV 文件
+**认证**：不需要  
+**描述**：解析上传的 Excel 或 CSV 文件，执行智能字段映射并返回预览数据
 
 | 参数 | 类型 | 必填 | 说明 |
 |-----|------|------|------|
-| [参数] | [类型] | | [说明] |
+| file | File | ✅ | Excel (.xlsx) 或 CSV (.csv) 文件 |
 
-**响应**：`{...}`
+**响应**：
+```json
+{
+  "filename": "sample.xlsx",
+  "file_hash": "sha256哈希值",
+  "total_rows": 100,
+  "columns": ["PNs", "Qty", "Supp", "Annual Spend"],
+  "mapping_suggestions": [
+    {
+      "original_header": "Qty",
+      "mapped_field": "Quantity",
+      "confidence": 1.0,
+      "is_mapped": true
+    }
+  ],
+  "preview_data": [
+    {"PNs": "A123", "Qty": 100, "Supp": "Supplier A"}
+  ]
+}
+```
+
+**错误**：
+- 400: 文件格式不支持
+- 500: 文件解析失败
 
 ## 错误码
 
