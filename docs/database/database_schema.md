@@ -32,12 +32,19 @@
 |-----|------|------|------|
 | session_id | VARCHAR | PK (复合) | 关联的会话 ID |
 | pns | VARCHAR | PK (复合) | 零件号（主键） |
+| part_desc | VARCHAR | | 零件名称 (中英文) |
 | commodity | VARCHAR | | 品类 |
 | supplier | VARCHAR | | 供应商 |
+| currency | VARCHAR | | 币种 |
 | quantity | DECIMAL(15,2) | | 数量 |
+| price | DECIMAL(15,2) | | 单价 |
 | apv | DECIMAL(15,2) | | 年度采购额 (Annual Purchase Value) |
+| covered_apv | DECIMAL(15,2) | | 覆盖分析的采购额 |
+| target_cost | DECIMAL(15,2) | | 目标单价 |
 | target_spend | DECIMAL(15,2) | | 目标支出 |
+| gap_to_target | DECIMAL(15,2) | | 单价差异 |
 | opportunity | DECIMAL(15,2) | | 机会金额 |
+| gap_percent | DECIMAL(5,2) | | 差异百分比 |
 | created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | 创建时间 |
 
 **主键**：(session_id, pns)  

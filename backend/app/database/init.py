@@ -35,12 +35,19 @@ def init_database():
         CREATE TABLE IF NOT EXISTS procurement_records (
             session_id VARCHAR,
             pns VARCHAR,
+            part_desc VARCHAR,
             commodity VARCHAR,
             supplier VARCHAR,
+            currency VARCHAR,
             quantity DECIMAL(15,2),
+            price DECIMAL(15,2),
             apv DECIMAL(15,2),
+            covered_apv DECIMAL(15,2),
+            target_cost DECIMAL(15,2),
             target_spend DECIMAL(15,2),
+            gap_to_target DECIMAL(15,2),
             opportunity DECIMAL(15,2),
+            gap_percent DECIMAL(5,2),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (session_id, pns)
         )

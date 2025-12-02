@@ -7,8 +7,9 @@ from app.schemas.upload import ColumnMapping, UploadResponse
 
 # 标准字段定义 (参考 PRD)
 STANDARD_FIELDS = [
-    "PNs", "Commodity", "Supplier", "Quantity", 
-    "APV", "TargetSpend", "Opportunity"
+    "PNs", "PartDescription", "Commodity", "Supplier", "Currency",
+    "Quantity", "Price", "APV", "CoveredAPV",
+    "TargetCost", "TargetSpend", "GapToTarget", "Opportunity", "GapPercent"
 ]
 
 class ExcelParser:
@@ -16,25 +17,34 @@ class ExcelParser:
         self.standard_fields = STANDARD_FIELDS
         # 预定义同义词库 (小写 -> 标准字段)
         self.synonyms = {
-            "qty": "Quantity",
-            "amount": "Quantity",
-            "vol": "Quantity",
-            "volume": "Quantity",
-            "supp": "Supplier",
-            "vendor": "Supplier",
-            "mfr": "Supplier",
-            "manufacturer": "Supplier",
-            "annual spend": "APV",
-            "spend": "APV",
-            "cost": "APV",
-            "part number": "PNs",
-            "pn": "PNs",
-            "part": "PNs",
-            "material": "PNs",
-            "diff": "Opportunity",
-            "gap": "Opportunity",
-            "saving": "Opportunity"
+            # 基础信息
+            "part number": "PNs", "pn": "PNs", "part": "PNs", "material": "PNs",
+            "part description": "PartDescription", "desc": "PartDescription", "description": "PartDescription",
+            "supp": "Supplier", "vendor": "Supplier", "mfr": "Supplier", "manufacturer": "Supplier",
+            "curr": "Currency",
+            
+            # 数量与价格
+            "qty": "Quantity", "vol": "Quantity", "volume": "Quantity",
+            "price": "Price", "unit price": "Price",
+            
+            # 支出相关
+            "annual spend": "APV", "spend": "APV", "cost": "APV", "2023 apv $": "APV",
+            "covered apv": "CoveredAPV",
+            
+            # 目标与机会
+            "target cost ap": "TargetCost", "target cost": "TargetCost",
+            "annual target spending $": "TargetSpend", "target spend": "TargetSpend",
+            "gap to target pc cost": "GapToTarget", "gap": "GapToTarget",
+            "annual target opportunity $": "Opportunity", "saving": "Opportunity",
+            "gap in %": "GapPercent", "gap %": "GapPercent"
         }
+        
+        # 正则匹配规则 (优先级高于同义词)
+        self.regex_patterns = [
+            (r'\d{4}.*quantity', "Quantity"),  # 匹配 "2023 quantity"
+            (r'\d{4}.*apv', "APV"),           # 匹配 "2023 APV $"
+            (r'price.*\d{4}', "Price"),       # 匹配 "Price 2023Q3"
+        ]
 
     def calculate_hash(self, file_content: bytes) -> str:
         return hashlib.sha256(file_content).hexdigest()
@@ -85,17 +95,26 @@ class ExcelParser:
             best_match = None
             max_score = 0.0
             
-            # 策略1: 精确匹配同义词
-            if header_lower in self.synonyms:
-                best_match = self.synonyms[header_lower]
-                max_score = 1.0
-            else:
-                # 策略2: Levenshtein 模糊匹配
-                for field in self.standard_fields:
-                    score = ratio(header_lower, field.lower())
-                    if score > max_score:
-                        max_score = score
-                        best_match = field
+            # 策略0: 正则匹配 (处理动态表头)
+            import re
+            for pattern, field in self.regex_patterns:
+                if re.search(pattern, header_lower):
+                    best_match = field
+                    max_score = 1.0
+                    break
+            
+            if not best_match:
+                # 策略1: 精确匹配同义词
+                if header_lower in self.synonyms:
+                    best_match = self.synonyms[header_lower]
+                    max_score = 1.0
+                else:
+                    # 策略2: Levenshtein 模糊匹配
+                    for field in self.standard_fields:
+                        score = ratio(header_lower, field.lower())
+                        if score > max_score:
+                            max_score = score
+                            best_match = field
             
             # 阈值判定 (0.8)
             is_mapped = max_score >= 0.8

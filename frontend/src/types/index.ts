@@ -30,10 +30,17 @@ export interface ConfirmMappingResponse {
 
 export const STANDARD_FIELDS = [
     { value: 'PNs', label: 'PNs (Part Number)' },
+    { value: 'PartDescription', label: 'Part Description' },
     { value: 'Commodity', label: 'Commodity' },
     { value: 'Supplier', label: 'Supplier' },
+    { value: 'Currency', label: 'Currency' },
     { value: 'Quantity', label: 'Quantity' },
+    { value: 'Price', label: 'Price' },
     { value: 'APV', label: 'APV (Annual Purchase Value)' },
+    { value: 'CoveredAPV', label: 'Covered APV' },
+    { value: 'TargetCost', label: 'Target Cost' },
     { value: 'TargetSpend', label: 'Target Spend' },
+    { value: 'GapToTarget', label: 'Gap to Target' },
     { value: 'Opportunity', label: 'Opportunity' },
+    { value: 'GapPercent', label: 'Gap %' },
 ];

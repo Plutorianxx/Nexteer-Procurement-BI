@@ -28,18 +28,31 @@ class ETLService:
         df_cleaned = df.rename(columns=rename_map)
         
         # 只保留标准字段
-        standard_fields = ["pns", "commodity", "supplier", "quantity", "apv", "target_spend", "opportunity"]
-        existing_fields = [f for f in standard_fields if f in df_cleaned.columns]
+        standard_fields = [
+            "pns", "partdescription", "commodity", "supplier", "currency",
+            "quantity", "price", "apv", "coveredapv",
+            "targetcost", "targetspend", "gaptotarget", "opportunity", "gappercent"
+        ]
+        # 转换为小写以便匹配
+        standard_fields_lower = [f.lower() for f in standard_fields]
+        
+        existing_fields = [f for f in standard_fields_lower if f in df_cleaned.columns]
         df_cleaned = df_cleaned[existing_fields]
         
         # 数据类型转换（数值字段）
-        numeric_fields = ["quantity", "apv", "target_spend", "opportunity"]
+        numeric_fields = [
+            "quantity", "price", "apv", "coveredapv", 
+            "targetcost", "targetspend", "gaptotarget", "opportunity", "gappercent"
+        ]
         for field in numeric_fields:
             if field in df_cleaned.columns:
+                # 去除货币符号和百分号
+                if df_cleaned[field].dtype == object:
+                    df_cleaned[field] = df_cleaned[field].astype(str).str.replace(r'[$,%]', '', regex=True)
                 df_cleaned[field] = pd.to_numeric(df_cleaned[field], errors='coerce').fillna(0)
         
         # 字符串字段去除空格
-        string_fields = ["pns", "commodity", "supplier"]
+        string_fields = ["pns", "partdescription", "commodity", "supplier", "currency"]
         for field in string_fields:
             if field in df_cleaned.columns:
                 df_cleaned[field] = df_cleaned[field].astype(str).str.strip()
@@ -49,31 +62,43 @@ class ETLService:
     def insert_records(self, session_id: str, df: pd.DataFrame) -> int:
         """
         批量插入采购记录
-        
-        Returns:
-            插入的行数
         """
         # 添加 session_id 列
         df["session_id"] = session_id
         
-        # 重新排列列顺序以匹配表结构
-        columns = ["session_id", "pns", "commodity", "supplier", "quantity", "apv", "target_spend", "opportunity"]
+        # 数据库字段名 (snake_case)
+        db_columns = [
+            "session_id", "pns", "part_desc", "commodity", "supplier", "currency",
+            "quantity", "price", "apv", "covered_apv",
+            "target_cost", "target_spend", "gap_to_target", "opportunity", "gap_percent"
+        ]
         
-        # 确保所有列都存在（如果缺少则填充默认值）
-        for col in columns:
-            if col not in df.columns:
-                df[col] = "" if col in ["pns", "commodity", "supplier"] else 0
+        # DataFrame 列名 (lower case standard fields)
+        df_columns = [
+            "session_id", "pns", "partdescription", "commodity", "supplier", "currency",
+            "quantity", "price", "apv", "coveredapv",
+            "targetcost", "targetspend", "gaptotarget", "opportunity", "gappercent"
+        ]
         
-        df_final = df[columns]
+        # 映射 DF 列到 DB 列
+        df_final = pd.DataFrame()
+        for db_col, df_col in zip(db_columns, df_columns):
+            if df_col in df.columns:
+                df_final[db_col] = df[df_col]
+            else:
+                # 填充默认值
+                if db_col in ["pns", "part_desc", "commodity", "supplier", "currency"]:
+                    df_final[db_col] = ""
+                else:
+                    df_final[db_col] = 0
         
         # 批量插入
         records = df_final.values.tolist()
+        placeholders = ",".join(["?"] * len(db_columns))
+        columns_str = ",".join(db_columns)
+        
         self.conn.executemany(
-            """
-            INSERT INTO procurement_records 
-            (session_id, pns, commodity, supplier, quantity, apv, target_spend, opportunity)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """,
+            f"INSERT INTO procurement_records ({columns_str}) VALUES ({placeholders})",
             records
         )
         
@@ -86,16 +111,12 @@ class ETLService:
             [session_id]
         ).fetchall()
         
-        return [
-            {
-                "session_id": row[0],
-                "pns": row[1],
-                "commodity": row[2],
-                "supplier": row[3],
-                "quantity": float(row[4]),
-                "apv": float(row[5]),
-                "target_spend": float(row[6]),
-                "opportunity": float(row[7])
-            }
-            for row in result
+        # 获取列名
+        columns = [
+            "session_id", "pns", "part_desc", "commodity", "supplier", "currency",
+            "quantity", "price", "apv", "covered_apv",
+            "target_cost", "target_spend", "gap_to_target", "opportunity", "gap_percent",
+            "created_at"
         ]
+        
+        return [dict(zip(columns, row)) for row in result]

@@ -137,12 +137,19 @@
   "records": [
     {
       "pns": "A123",
-      "commodity": "电子元器件",
+      "part_desc": "Controller Asm",
+      "commodity": "Electronics",
       "supplier": "Supplier A",
+      "currency": "USD",
       "quantity": 100.0,
+      "price": 10.0,
       "apv": 1000.0,
+      "covered_apv": 1000.0,
+      "target_cost": 9.0,
       "target_spend": 900.0,
-      "opportunity": 100.0
+      "gap_to_target": 1.0,
+      "opportunity": 100.0,
+      "gap_percent": 10.0
     }
   ],
   "total": 100
