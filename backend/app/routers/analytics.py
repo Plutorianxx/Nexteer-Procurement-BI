@@ -60,3 +60,20 @@ async def get_supplier_top_pns(session_id: str, supplier: str, limit: int = 10):
         return service.get_supplier_top_pns(session_id, supplier, limit)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/opportunity-matrix/{session_id}")
+async def get_opportunity_matrix(session_id: str, commodity: str = Query(None)):
+    """获取象限分析数据 (Opportunity Matrix)"""
+    try:
+        return service.get_opportunity_matrix(session_id, commodity)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/concentration/{session_id}")
+async def get_supplier_concentration(session_id: str, commodity: str = Query(None)):
+    """获取供应商集中度 (CR3, CR5)"""
+    try:
+        return service.get_supplier_concentration(session_id, commodity)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+

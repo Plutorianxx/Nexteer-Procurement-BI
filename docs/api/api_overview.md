@@ -211,6 +211,51 @@
 ]
 ```
 
+
+### GET /api/analytics/opportunity-matrix/{session_id} 获取象限分析数据
+**认证**：不需要
+
+**参数**：
+- `commodity` (query, optional): 过滤特定 Commodity
+
+**响应**：
+```json
+[
+  {
+    "pns": "A123",
+    "part_desc": "Controller",
+    "supplier": "Supplier A",
+    "commodity": "Electronics",
+    "apv": 50000.0,
+    "gap_percent": 15.0,
+    "opportunity": 7500.0
+  }
+]
+```
+
+### GET /api/analytics/concentration/{session_id} 获取供应商集中度
+**认证**：不需要
+
+**参数**：
+- `commodity` (query, optional): 过滤特定 Commodity
+
+**响应**：
+```json
+{
+  "cr3": 65.5,
+  "cr5": 80.2,
+  "total_suppliers": 20,
+  "total_apv": 1000000.0,
+  "top_suppliers": [
+    {
+      "supplier": "Supplier A",
+      "apv": 300000.0,
+      "share": 30.0
+    }
+  ]
+}
+```
+
 ## 错误码
 
 | 错误码 | HTTP状态 | 说明 |

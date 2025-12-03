@@ -40,6 +40,8 @@
 - `src/services/api.ts`: Axios 封装
 - `src/services/uploadService.ts`: 上传服务
 - `src/pages/CommodityDetail/index.tsx`: 品类详情页
+- `src/components/OpportunityMatrix.tsx`: 象限分析气泡图
+- `src/components/ConcentrationChart.tsx`: 供应商集中度图表
 - `src/components/TopSuppliersChart.tsx`: Top Suppliers 双轴图
 - `src/components/SupplierDetailCard.tsx`: 交互式 Supplier 详情卡片
 - `src/services/analyticsService.ts`: 分析服务

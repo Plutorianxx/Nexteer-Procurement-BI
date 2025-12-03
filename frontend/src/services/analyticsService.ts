@@ -28,5 +28,17 @@ export const analyticsService = {
 
     getSupplierTopPNs: async (sessionId: string, supplier: string, limit: number = 10) => {
         return api.get(`/analytics/supplier/${sessionId}/${encodeURIComponent(supplier)}/top-pns`, { params: { limit } });
+    },
+
+    getOpportunityMatrix: async (sessionId: string, commodity?: string) => {
+        return api.get(`/analytics/opportunity-matrix/${sessionId}`, {
+            params: commodity ? { commodity } : {}
+        });
+    },
+
+    getSupplierConcentration: async (sessionId: string, commodity?: string) => {
+        return api.get(`/analytics/concentration/${sessionId}`, {
+            params: commodity ? { commodity } : {}
+        });
     }
 };

@@ -222,3 +222,96 @@ class AnalyticsService:
             }
             for row in results
         ]
+
+    def get_opportunity_matrix(self, session_id: str, commodity: str = None) -> List[Dict[str, Any]]:
+        """
+        获取象限分析数据 (Opportunity Matrix)
+        返回所有 PNs 的 APV, Gap%, Opportunity 用于气泡图
+        """
+        base_query = """
+        SELECT 
+            pns,
+            part_desc,
+            supplier,
+            commodity,
+            apv,
+            gap_percent,
+            opportunity
+        FROM procurement_records
+        WHERE session_id = ?
+        """
+        
+        if commodity:
+            query = base_query + " AND commodity = ?"
+            results = self.conn.execute(query, [session_id, commodity]).fetchall()
+        else:
+            results = self.conn.execute(base_query, [session_id]).fetchall()
+        
+        return [
+            {
+                "pns": row[0],
+                "part_desc": row[1],
+                "supplier": row[2],
+                "commodity": row[3],
+                "apv": float(row[4] or 0),
+                "gap_percent": float(row[5] or 0),
+                "opportunity": float(row[6] or 0)
+            }
+            for row in results
+        ]
+
+    def get_supplier_concentration(self, session_id: str, commodity: str = None) -> Dict[str, Any]:
+        """
+        计算供应商集中度 (CR3, CR5)
+        """
+        base_query = """
+        SELECT 
+            supplier,
+            SUM(apv) as total_apv
+        FROM procurement_records
+        WHERE session_id = ?
+        """
+        
+        if commodity:
+            query = base_query + " AND commodity = ? GROUP BY supplier ORDER BY total_apv DESC"
+            results = self.conn.execute(query, [session_id, commodity]).fetchall()
+        else:
+            query = base_query + " GROUP BY supplier ORDER BY total_apv DESC"
+            results = self.conn.execute(query, [session_id]).fetchall()
+        
+        # 计算总 APV
+        total_apv = sum(float(row[1] or 0) for row in results)
+        
+        if total_apv == 0:
+            return {
+                "cr3": 0.0,
+                "cr5": 0.0,
+                "total_suppliers": 0,
+                "top_suppliers": []
+            }
+        
+        # 计算 CR3 和 CR5
+        cr3_apv = sum(float(row[1] or 0) for row in results[:3])
+        cr5_apv = sum(float(row[1] or 0) for row in results[:5])
+        
+        cr3 = (cr3_apv / total_apv) * 100
+        cr5 = (cr5_apv / total_apv) * 100
+        
+        # 返回详细数据
+        top_suppliers = [
+            {
+                "supplier": row[0],
+                "apv": float(row[1] or 0),
+                "share": (float(row[1] or 0) / total_apv) * 100
+            }
+            for row in results[:10]  # 返回 Top 10 用于展示
+        ]
+        
+        return {
+            "cr3": cr3,
+            "cr5": cr5,
+            "total_suppliers": len(results),
+            "total_apv": total_apv,
+            "top_suppliers": top_suppliers
+        }
+

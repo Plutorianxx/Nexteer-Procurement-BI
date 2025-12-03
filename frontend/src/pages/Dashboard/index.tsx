@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Layout, Row, Col, Typography, Table, Card, Spin } from 'antd';
 import { KPICard } from '../../components/KPICard';
 import { CommodityChart } from '../../components/CommodityChart';
+import { OpportunityMatrix } from '../../components/OpportunityMatrix';
+import { ConcentrationChart } from '../../components/ConcentrationChart';
 import { analyticsService } from '../../services/analyticsService';
 import type { KPISummary, CommodityData, SupplierRank, ProjectRank } from '../../types/analytics';
 import { useSearchParams } from 'react-router-dom';
@@ -20,6 +22,8 @@ export const Dashboard: React.FC = () => {
     const [commodityData, setCommodityData] = useState<CommodityData[]>([]);
     const [topSuppliers, setTopSuppliers] = useState<SupplierRank[]>([]);
     const [topProjects, setTopProjects] = useState<ProjectRank[]>([]);
+    const [matrixData, setMatrixData] = useState<any[]>([]);
+    const [concentrationData, setConcentrationData] = useState<any>(null);
 
     useEffect(() => {
         // 如果没有 session_id，暂时不加载（实际场景应跳转回上传页或显示空状态）
@@ -28,16 +32,20 @@ export const Dashboard: React.FC = () => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const [sum, com, sup, proj] = await Promise.all([
+                const [sum, com, sup, proj, matrix, concentration] = await Promise.all([
                     analyticsService.getSummary(sessionId),
                     analyticsService.getCommodityOverview(sessionId),
                     analyticsService.getTopSuppliers(sessionId),
-                    analyticsService.getTopProjects(sessionId)
+                    analyticsService.getTopProjects(sessionId),
+                    analyticsService.getOpportunityMatrix(sessionId),
+                    analyticsService.getSupplierConcentration(sessionId)
                 ]);
                 setSummary(sum);
                 setCommodityData(com);
                 setTopSuppliers(sup);
                 setTopProjects(proj);
+                setMatrixData(matrix as any);
+                setConcentrationData(concentration);
             } catch (error) {
                 console.error("Failed to fetch dashboard data", error);
             } finally {
@@ -124,6 +132,20 @@ export const Dashboard: React.FC = () => {
                                             { title: 'Opportunity', dataIndex: 'opportunity', render: val => <span style={{ color: '#E31837' }}>${val.toLocaleString()}</span> },
                                         ]}
                                     />
+                                </Card>
+                            </Col>
+                        </Row>
+
+                        {/* 4. Advanced Analytics */}
+                        <Row gutter={24} style={{ marginTop: 24 }}>
+                            <Col span={12}>
+                                <Card title="Opportunity Matrix">
+                                    <OpportunityMatrix data={matrixData} />
+                                </Card>
+                            </Col>
+                            <Col span={12}>
+                                <Card title="Supplier Concentration">
+                                    <ConcentrationChart data={concentrationData} />
                                 </Card>
                             </Col>
                         </Row>

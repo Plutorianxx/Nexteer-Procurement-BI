@@ -5,7 +5,12 @@
 ## 未发布
 
 ### 12-02
-- `feat`: 开发 Commodity Detail Page，支持独立分析和交互式图表
+- `feat`: 新增动态象限分析 (Opportunity Matrix)，支持交互式阈值设定与四象限自动着色
+- `feat`: 新增供应商集中度 (Supplier Concentration) 分析，包含 CR3/CR5 指标和 Top 5 饼图
+- `style`: 优化气泡图坐标轴逻辑，支持对数轴与线性轴切换，解决长尾数据展示问题
+- `style`: 优化饼图配色方案 (Nexteer 品牌色系) 与图例显示逻辑
+- `feat`: 在 Dashboard 和 Commodity Detail 页面集成高级分析模块
+- `feat`: 后端新增 `/opportunity-matrix` 和 `/concentration` 聚合接口
 - `feat`: 实现 Top Suppliers 双轴图（柱状 + 折线）
 - `feat`: 开发交互式 Supplier Detail Card，支持用户自定义数据系列
 - `feat`: 在 Commodity Chart 上添加点击跳转到详情页功能

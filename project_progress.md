@@ -14,6 +14,11 @@
 
 ## 最近完成（保留最近5轮）
 
+### 12-03 - 高级分析 (Phase 2) - 完成
+**完成**：实现动态象限分析 (Opportunity Matrix) 和供应商集中度 (Concentration) 分析
+**文件**：`frontend/src/components/OpportunityMatrix.tsx`, `frontend/src/components/ConcentrationChart.tsx`, `backend/app/services/analytics_service.py`
+**备注**：Matrix 支持交互式阈值调整与动态四象限着色；Concentration 优化为 Top 5 + Others 显示
+
 ### 12-03 - Commodity Detail Page (品类详情页) - 完成
 **完成**：开发 Corn Commodity 独立视图，包括 KPI、Top 5 Suppliers 图表、交互式数据系列、Top 10 PNs 表
 **文件**：`backend/app/services/analytics_service.py`,`backend/app/routers/analytics.py`, `frontend/src/pages/CommodityDetail/`, `frontend/src/components/TopSuppliersChart.tsx`, `frontend/src/components/SupplierDetailCard.tsx`

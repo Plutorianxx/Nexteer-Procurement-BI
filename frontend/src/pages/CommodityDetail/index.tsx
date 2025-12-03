@@ -4,6 +4,8 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { KPICard } from '../../components/KPICard';
 import { TopSuppliersChart } from '../../components/TopSuppliersChart';
 import { SupplierDetailCard } from '../../components/SupplierDetailCard';
+import { OpportunityMatrix } from '../../components/OpportunityMatrix';
+import { ConcentrationChart } from '../../components/ConcentrationChart';
 import { analyticsService } from '../../services/analyticsService';
 import type { KPISummary } from '../../types/analytics';
 
@@ -34,6 +36,8 @@ export const CommodityDetail: React.FC = () => {
     const [kpi, setKpi] = useState<KPISummary | null>(null);
     const [topSuppliers, setTopSuppliers] = useState<SupplierData[]>([]);
     const [supplierPNs, setSupplierPNs] = useState<Record<string, PNData[]>>({});
+    const [matrixData, setMatrixData] = useState<any[]>([]);
+    const [concentrationData, setConcentrationData] = useState<any>(null);
 
     useEffect(() => {
         if (!sessionId || !commodityName) return;
@@ -41,14 +45,18 @@ export const CommodityDetail: React.FC = () => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const [kpiData, suppliersResponse] = await Promise.all([
+                const [kpiData, suppliersResponse, matrix, concentration] = await Promise.all([
                     analyticsService.getCommodityKPI(sessionId, commodityName),
-                    analyticsService.getCommodityTopSuppliers(sessionId, commodityName, 5)
+                    analyticsService.getCommodityTopSuppliers(sessionId, commodityName, 5),
+                    analyticsService.getOpportunityMatrix(sessionId, commodityName),
+                    analyticsService.getSupplierConcentration(sessionId, commodityName)
                 ]);
 
                 setKpi(kpiData);
                 const suppliers = suppliersResponse as unknown as SupplierData[];
                 setTopSuppliers(suppliers);
+                setMatrixData(matrix as any);
+                setConcentrationData(concentration);
 
                 // 加载每个 Supplier 的 Top 10 PNs
                 const pnsPromises = suppliers.map((s: SupplierData) =>
@@ -158,6 +166,20 @@ export const CommodityDetail: React.FC = () => {
                                 ))}
                             </Collapse>
                         </Card>
+
+                        {/* 4. Advanced Analytics */}
+                        <Row gutter={24} style={{ marginTop: 24 }}>
+                            <Col span={12}>
+                                <Card title="Opportunity Matrix">
+                                    <OpportunityMatrix data={matrixData} />
+                                </Card>
+                            </Col>
+                            <Col span={12}>
+                                <Card title="Supplier Concentration">
+                                    <ConcentrationChart data={concentrationData} />
+                                </Card>
+                            </Col>
+                        </Row>
                     </>
                 )}
             </Content>
