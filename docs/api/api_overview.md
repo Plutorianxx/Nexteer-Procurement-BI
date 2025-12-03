@@ -256,6 +256,30 @@
 }
 ```
 
+
+### POST /api/llm/generate-report 生成智能报告
+**认证**：不需要 (API Key 在请求体中)
+
+**请求体**：
+```json
+{
+  "session_id": "uuid",
+  "context_type": "dashboard", // dashboard, commodity, supplier
+  "context_value": "Electronics", // 可选
+  "config": {
+    "provider": "openai",
+    "api_key": "sk-...",
+    "base_url": "https://api.openai.com/v1",
+    "model": "gpt-4o",
+    "temperature": 0.7
+  }
+}
+```
+
+**响应**：
+- Content-Type: `text/event-stream`
+- 流式返回 Markdown 文本块
+
 ## 错误码
 
 | 错误码 | HTTP状态 | 说明 |

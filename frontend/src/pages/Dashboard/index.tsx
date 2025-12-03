@@ -4,6 +4,7 @@ import { KPICard } from '../../components/KPICard';
 import { CommodityChart } from '../../components/CommodityChart';
 import { OpportunityMatrix } from '../../components/OpportunityMatrix';
 import { ConcentrationChart } from '../../components/ConcentrationChart';
+import { AIReportCard } from '../../components/AIReportCard';
 import { analyticsService } from '../../services/analyticsService';
 import type { KPISummary, CommodityData, SupplierRank, ProjectRank } from '../../types/analytics';
 import { useSearchParams } from 'react-router-dom';
@@ -90,6 +91,9 @@ export const Dashboard: React.FC = () => {
                                 <KPICard title="Gap % of APV" value={summary?.gap_percent || 0} suffix="%" precision={1} color="#E31837" />
                             </Col>
                         </Row>
+
+                        {/* AI Report */}
+                        <AIReportCard sessionId={sessionId} contextType="dashboard" />
 
                         {/* 2. Commodity Overview Chart */}
                         <Card title="Commodity Overview" style={{ marginBottom: 24 }}>

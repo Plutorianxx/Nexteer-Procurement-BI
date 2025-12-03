@@ -5,6 +5,9 @@
 ## 未发布
 
 ### 12-02
+- `feat`: 新增 LLM 智能分析服务，支持生成 Executive Summary
+- `feat`: 前端新增 AIReportCard 组件，支持流式 Markdown 渲染和多模型配置 (OpenAI/Kimi/GLM)
+- `feat`: 后端实现 OpenAI 兼容接口适配器，支持国产大模型
 - `feat`: 新增动态象限分析 (Opportunity Matrix)，支持交互式阈值设定与四象限自动着色
 - `feat`: 新增供应商集中度 (Supplier Concentration) 分析，包含 CR3/CR5 指标和 Top 5 饼图
 - `style`: 优化气泡图坐标轴逻辑，支持对数轴与线性轴切换，解决长尾数据展示问题

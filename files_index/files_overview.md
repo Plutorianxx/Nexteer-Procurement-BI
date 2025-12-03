@@ -40,6 +40,9 @@
 - `src/services/api.ts`: Axios 封装
 - `src/services/uploadService.ts`: 上传服务
 - `src/pages/CommodityDetail/index.tsx`: 品类详情页
+- `src/components/AIReportCard.tsx`: LLM 智能报告组件
+- `src/services/llmService.ts`: LLM 前端服务
+- `src/types/llm.ts`: LLM 类型定义
 - `src/components/OpportunityMatrix.tsx`: 象限分析气泡图
 - `src/components/ConcentrationChart.tsx`: 供应商集中度图表
 - `src/components/TopSuppliersChart.tsx`: Top Suppliers 双轴图
