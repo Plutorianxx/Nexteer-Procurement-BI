@@ -46,6 +46,8 @@
 - `src/components/OpportunityMatrix.tsx`: 象限分析气泡图
 - `src/components/ConcentrationChart.tsx`: 供应商集中度图表
 - `src/components/TopSuppliersChart.tsx`: Top Suppliers 双轴图
+- `src/components/TopPNsTable.tsx`: Top PNs 表格
+- `src/utils/excelExport.ts`: Excel 导出工具函数
 - `src/components/SupplierDetailCard.tsx`: 交互式 Supplier 详情卡片
 - `src/services/analyticsService.ts`: 分析服务
 - `src/types/index.ts`: 基础类型定义

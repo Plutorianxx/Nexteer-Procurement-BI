@@ -27,6 +27,17 @@ export const CommodityChart: React.FC<Props> = ({ data }) => {
                 data: ['Total APV', 'Covered APV', 'Gap %'],
                 bottom: 0
             },
+            toolbox: {
+                feature: {
+                    saveAsImage: {
+                        title: 'Save as Image',
+                        name: `Commodity_Analysis_${new Date().toISOString().split('T')[0]}`,
+                        pixelRatio: 2
+                    }
+                },
+                right: 20,
+                top: 10
+            },
             grid: {
                 left: '3%',
                 right: '4%',

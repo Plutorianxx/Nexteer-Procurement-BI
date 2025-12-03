@@ -55,6 +55,17 @@ export const ConcentrationChart: React.FC<Props> = ({ data }) => {
                     return `${params.name}<br/>APV: $${params.value.toLocaleString()}<br/>Share: ${share}%`;
                 }
             },
+            toolbox: {
+                feature: {
+                    saveAsImage: {
+                        title: 'Save as Image',
+                        name: `Supplier_Concentration_${new Date().toISOString().split('T')[0]}`,
+                        pixelRatio: 2
+                    }
+                },
+                right: 20,
+                top: 10
+            },
             legend: {
                 bottom: 10,
                 left: 'center',

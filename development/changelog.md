@@ -4,6 +4,12 @@
 
 ## 未发布
 
+### 12-03
+- `feat`: 新增 Excel 数据导出功能，支持 Dashboard 和 Commodity Detail 的完整数据导出
+- `feat`: 为所有 ECharts 图表启用工具栏图片导出功能（PNG, 2x 高清）
+- `feat`: Dashboard 导出包含 6 个 Sheet（KPI/Commodities/Suppliers/Projects/Matrix/Concentration）
+- `feat`: Commodity Detail 导出包含 5 个 Sheet（KPI/Top Suppliers/All PNs/Matrix/Concentration）
+
 ### 12-02
 - `feat`: 新增 LLM 智能分析服务，支持生成 Executive Summary
 - `feat`: 前端新增 AIReportCard 组件，支持流式 Markdown 渲染、多模型配置及 Prompt 自定义编辑

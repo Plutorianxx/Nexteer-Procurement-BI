@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Layout, Row, Col, Typography, Table, Card, Spin, Collapse, Button } from 'antd';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, DownloadOutlined } from '@ant-design/icons';
 import { KPICard } from '../../components/KPICard';
 import { TopSuppliersChart } from '../../components/TopSuppliersChart';
 import { SupplierDetailCard } from '../../components/SupplierDetailCard';
@@ -10,6 +10,8 @@ import { ConcentrationChart } from '../../components/ConcentrationChart';
 import { AIReportCard } from '../../components/AIReportCard';
 import { analyticsService } from '../../services/analyticsService';
 import type { KPISummary } from '../../types/analytics';
+import { exportCommodityToExcel } from '../../utils/excelExport';
+import { message } from 'antd';
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -83,6 +85,29 @@ export const CommodityDetail: React.FC = () => {
         fetchData();
     }, [sessionId, commodityName]);
 
+    const handleExport = () => {
+        if (!kpi || !topSuppliers.length) {
+            message.warning('No data available to export');
+            return;
+        }
+
+        try {
+            exportCommodityToExcel(
+                sessionId,
+                commodityName!,
+                kpi,
+                topSuppliers,
+                supplierPNs,
+                matrixData,
+                concentrationData
+            );
+            message.success('Excel exported successfully');
+        } catch (error) {
+            console.error('Export failed:', error);
+            message.error('Failed to export Excel');
+        }
+    };
+
     if (!sessionId || !commodityName) {
         return <div style={{ padding: 50 }}>Invalid parameters</div>;
     }
@@ -90,17 +115,27 @@ export const CommodityDetail: React.FC = () => {
     return (
         <Layout style={{ minHeight: '100vh', background: '#F5F5F5' }}>
             <Content style={{ padding: '24px' }}>
-                <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center' }}>
+                <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <Button
+                            icon={<ArrowLeftOutlined />}
+                            onClick={() => navigate(`/dashboard?session_id=${sessionId}`)}
+                            style={{ marginRight: 16 }}
+                        >
+                            Back to Overview
+                        </Button>
+                        <Title level={2} style={{ margin: 0 }}>
+                            {commodityName} - Detail Analysis
+                        </Title>
+                    </div>
                     <Button
-                        icon={<ArrowLeftOutlined />}
-                        onClick={() => navigate(`/dashboard?session_id=${sessionId}`)}
-                        style={{ marginRight: 16 }}
+                        type="default"
+                        icon={<DownloadOutlined />}
+                        onClick={handleExport}
+                        disabled={loading}
                     >
-                        Back to Overview
+                        Export to Excel
                     </Button>
-                    <Title level={2} style={{ margin: 0 }}>
-                        {commodityName} - Detail Analysis
-                    </Title>
                 </div>
 
                 {loading ? (

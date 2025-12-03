@@ -14,6 +14,11 @@
 
 ## 最近完成（保留最近5轮）
 
+### 12-03 - 导出功能 (Phase 4) - 完成
+**完成**：实现 Excel 数据导出和图表图片导出功能
+**文件**：`frontend/src/utils/excelExport.ts`, Dashboard/CommodityDetail 页面, 所有图表组件
+**备注**：Dashboard 导出 6 个 Sheet，Commodity Detail 导出 5 个 Sheet，所有 ECharts 图表支持 PNG 导出
+
 ### 12-03 - LLM 智能分析 (Phase 3) - 完成
 **完成**：实现基于 LLM 的智能执行摘要报告生成，支持 Prompt 自定义与编辑
 **文件**：`backend/app/services/llm_service.py`, `frontend/src/components/AIReportCard.tsx`, `frontend/src/pages/CommodityDetail/index.tsx`

@@ -8,6 +8,9 @@ import { AIReportCard } from '../../components/AIReportCard';
 import { analyticsService } from '../../services/analyticsService';
 import type { KPISummary, CommodityData, SupplierRank, ProjectRank } from '../../types/analytics';
 import { useSearchParams } from 'react-router-dom';
+import { Button, message } from 'antd';
+import { DownloadOutlined } from '@ant-design/icons';
+import { exportDashboardToExcel } from '../../utils/excelExport';
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -57,6 +60,29 @@ export const Dashboard: React.FC = () => {
         fetchData();
     }, [sessionId]);
 
+    const handleExport = () => {
+        if (!summary || !commodityData.length) {
+            message.warning('No data available to export');
+            return;
+        }
+
+        try {
+            exportDashboardToExcel(
+                sessionId,
+                summary,
+                commodityData,
+                topSuppliers,
+                topProjects,
+                matrixData,
+                concentrationData
+            );
+            message.success('Excel exported successfully');
+        } catch (error) {
+            console.error('Export failed:', error);
+            message.error('Failed to export Excel');
+        }
+    };
+
     if (!sessionId) {
         return <div style={{ padding: 50 }}>Please upload a file first.</div>;
     }
@@ -64,7 +90,17 @@ export const Dashboard: React.FC = () => {
     return (
         <Layout style={{ minHeight: '100vh', background: '#F5F5F5' }}>
             <Content style={{ padding: '24px' }}>
-                <Title level={2} style={{ marginBottom: 24 }}>Commodity Assessment Overview</Title>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+                    <Title level={2} style={{ margin: 0 }}>Commodity Assessment Overview</Title>
+                    <Button
+                        type="default"
+                        icon={<DownloadOutlined />}
+                        onClick={handleExport}
+                        disabled={loading}
+                    >
+                        Export to Excel
+                    </Button>
+                </div>
 
                 {loading ? (
                     <Spin size="large" style={{ display: 'block', margin: '100px auto' }} />

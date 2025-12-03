@@ -103,6 +103,17 @@ export const OpportunityMatrix: React.FC<Props> = ({ data }) => {
           `;
                 }
             },
+            toolbox: {
+                feature: {
+                    saveAsImage: {
+                        title: 'Save as Image',
+                        name: `Opportunity_Matrix_${new Date().toISOString().split('T')[0]}`,
+                        pixelRatio: 2
+                    }
+                },
+                right: 20,
+                top: 5
+            },
             grid: {
                 left: '10%',
                 right: '10%',
