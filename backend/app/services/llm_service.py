@@ -33,13 +33,15 @@ Keep it concise, professional, and data-driven.
             commodities = self.analytics.get_commodity_overview(session_id)
             top_suppliers = self.analytics.get_top_suppliers(session_id, limit=5)
             concentration = self.analytics.get_supplier_concentration(session_id)
+            matrix_stats = self.analytics.get_matrix_stats(session_id)
             
             data = {
                 "scope": "Global Dashboard",
                 "kpi": kpi,
                 "top_commodities": commodities[:5], # 只取前5个关键品类
                 "top_suppliers_by_opportunity": top_suppliers,
-                "supplier_concentration": concentration
+                "supplier_concentration": concentration,
+                "matrix_quadrant_stats": matrix_stats
             }
             
         elif context_type == "commodity":
@@ -49,6 +51,7 @@ Keep it concise, professional, and data-driven.
             top_suppliers = self.analytics.get_commodity_top_suppliers(session_id, commodity, limit=5)
             matrix = self.analytics.get_opportunity_matrix(session_id, commodity)
             concentration = self.analytics.get_supplier_concentration(session_id, commodity)
+            matrix_stats = self.analytics.get_matrix_stats(session_id, commodity)
             
             # 简化 Matrix 数据，只取 Opportunity 最大的前 10 个点
             top_opportunities = sorted(matrix, key=lambda x: x['opportunity'], reverse=True)[:10]
@@ -58,12 +61,18 @@ Keep it concise, professional, and data-driven.
                 "kpi": kpi,
                 "top_suppliers": top_suppliers,
                 "top_opportunities_pns": top_opportunities,
-                "concentration": concentration
+                "concentration": concentration,
+                "matrix_quadrant_stats": matrix_stats,
+                "coverage": {
+                    "spend_covered": kpi.get("spending_covered", 0),
+                    "total_spend": kpi.get("total_spending", 0),
+                    "coverage_percent": (kpi.get("spending_covered", 0) / kpi.get("total_spending", 1)) * 100 if kpi.get("total_spending", 0) > 0 else 0
+                }
             }
 
         return json.dumps(data, indent=2, ensure_ascii=False)
 
-    async def generate_report_stream(self, session_id: str, context_type: str, context_value: str, config: LLMConfig) -> AsyncGenerator[str, None]:
+    async def generate_report_stream(self, session_id: str, context_type: str, context_value: str, config: LLMConfig, prompt_template: str = None) -> AsyncGenerator[str, None]:
         """
         生成流式报告
         """
@@ -77,7 +86,19 @@ Keep it concise, professional, and data-driven.
         )
         
         # 3. 构建 Prompt
-        user_prompt = f"""
+        if prompt_template:
+            # 使用用户自定义 Prompt
+            user_prompt = f"""
+{prompt_template}
+
+Data Context:
+```json
+{context_data}
+```
+"""
+        else:
+            # 使用默认 Prompt
+            user_prompt = f"""
 Please analyze the following procurement data and generate an executive summary:
 
 Data Context:

@@ -17,7 +17,8 @@ async def generate_report(request: ReportRequest):
                 request.session_id,
                 request.context_type,
                 request.context_value,
-                request.config
+                request.config,
+                request.prompt_template
             ),
             media_type="text/event-stream"
         )

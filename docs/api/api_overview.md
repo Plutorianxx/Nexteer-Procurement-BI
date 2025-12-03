@@ -266,6 +266,7 @@
   "session_id": "uuid",
   "context_type": "dashboard", // dashboard, commodity, supplier
   "context_value": "Electronics", // 可选
+  "prompt_template": "## Custom Analysis...", // 可选，自定义 Prompt
   "config": {
     "provider": "openai",
     "api_key": "sk-...",

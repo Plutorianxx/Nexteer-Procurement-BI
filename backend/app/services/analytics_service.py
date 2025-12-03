@@ -315,3 +315,52 @@ class AnalyticsService:
             "top_suppliers": top_suppliers
         }
 
+    def get_matrix_stats(self, session_id: str, commodity: str = None) -> Dict[str, Any]:
+        """
+        计算象限分布统计 (用于 LLM 分析)
+        """
+        matrix = self.get_opportunity_matrix(session_id, commodity)
+        if not matrix:
+            return {"high_value_high_gap": {"count": 0, "total_opportunity": 0}, "high_value_low_gap": {"count": 0, "total_opportunity": 0}, "low_value_high_gap": {"count": 0, "total_opportunity": 0}, "low_value_low_gap": {"count": 0, "total_opportunity": 0}}
+
+        # 计算中位数作为阈值
+        apv_values = [m['apv'] for m in matrix]
+        gap_values = [m['gap_percent'] for m in matrix]
+        
+        def median(lst):
+            n = len(lst)
+            s = sorted(lst)
+            return (s[n//2] if n % 2 == 1 else (s[n//2-1] + s[n//2])/2) if n > 0 else 0
+
+        apv_threshold = median(apv_values)
+        gap_threshold = median(gap_values)
+
+        stats = {
+            "high_value_high_gap": {"count": 0, "total_opportunity": 0}, # Core Opportunity
+            "high_value_low_gap": {"count": 0, "total_opportunity": 0},  # Stable
+            "low_value_high_gap": {"count": 0, "total_opportunity": 0},  # Potential
+            "low_value_low_gap": {"count": 0, "total_opportunity": 0}    # Ignore
+        }
+
+        for item in matrix:
+            apv = item['apv']
+            gap = item['gap_percent']
+            opp = item['opportunity']
+            
+            if apv >= apv_threshold and gap >= gap_threshold:
+                key = "high_value_high_gap"
+            elif apv >= apv_threshold and gap < gap_threshold:
+                key = "high_value_low_gap"
+            elif apv < apv_threshold and gap >= gap_threshold:
+                key = "low_value_high_gap"
+            else:
+                key = "low_value_low_gap"
+            
+            stats[key]["count"] += 1
+            stats[key]["total_opportunity"] += opp
+
+        return {
+            "thresholds": {"apv": apv_threshold, "gap": gap_threshold},
+            "quadrants": stats
+        }
+

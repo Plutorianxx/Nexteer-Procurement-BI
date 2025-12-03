@@ -15,9 +15,9 @@
 ## 最近完成（保留最近5轮）
 
 ### 12-03 - LLM 智能分析 (Phase 3) - 完成
-**完成**：实现基于 LLM 的智能执行摘要报告生成
-**文件**：`backend/app/services/llm_service.py`, `backend/app/routers/llm.py`, `frontend/src/components/AIReportCard.tsx`, `frontend/src/services/llmService.ts`
-**备注**：支持 OpenAI/Kimi/GLM 等多模型，流式输出，已集成至 Dashboard
+**完成**：实现基于 LLM 的智能执行摘要报告生成，支持 Prompt 自定义与编辑
+**文件**：`backend/app/services/llm_service.py`, `frontend/src/components/AIReportCard.tsx`, `frontend/src/pages/CommodityDetail/index.tsx`
+**备注**：支持 Dashboard/Commodity 双维度分析，Prompt 可持久化保存，流式输出
 
 ### 12-03 - 高级分析 (Phase 2) - 完成
 **完成**：实现动态象限分析 (Opportunity Matrix) 和供应商集中度 (Concentration) 分析

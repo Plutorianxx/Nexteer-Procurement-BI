@@ -12,4 +12,5 @@ class ReportRequest(BaseModel):
     session_id: str
     context_type: Literal["dashboard", "commodity", "supplier"]
     context_value: Optional[str] = None  # e.g. commodity name or supplier name
+    prompt_template: Optional[str] = None
     config: LLMConfig

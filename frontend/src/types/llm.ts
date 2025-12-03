@@ -10,5 +10,6 @@ export interface ReportRequest {
     session_id: string;
     context_type: 'dashboard' | 'commodity' | 'supplier';
     context_value?: string;
+    prompt_template?: string;
     config: LLMConfig;
 }

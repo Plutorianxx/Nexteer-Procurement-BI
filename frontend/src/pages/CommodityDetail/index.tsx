@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Layout, Row, Col, Typography, Table, Card, Spin, Collapse } from 'antd';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { Layout, Row, Col, Typography, Table, Card, Spin, Collapse, Button } from 'antd';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import { KPICard } from '../../components/KPICard';
 import { TopSuppliersChart } from '../../components/TopSuppliersChart';
 import { SupplierDetailCard } from '../../components/SupplierDetailCard';
 import { OpportunityMatrix } from '../../components/OpportunityMatrix';
 import { ConcentrationChart } from '../../components/ConcentrationChart';
+import { AIReportCard } from '../../components/AIReportCard';
 import { analyticsService } from '../../services/analyticsService';
 import type { KPISummary } from '../../types/analytics';
 
@@ -30,6 +32,7 @@ interface PNData {
 export const CommodityDetail: React.FC = () => {
     const { commodityName } = useParams<{ commodityName: string }>();
     const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
     const sessionId = searchParams.get('session_id') || '';
 
     const [loading, setLoading] = useState(true);
@@ -87,9 +90,18 @@ export const CommodityDetail: React.FC = () => {
     return (
         <Layout style={{ minHeight: '100vh', background: '#F5F5F5' }}>
             <Content style={{ padding: '24px' }}>
-                <Title level={2} style={{ marginBottom: 24 }}>
-                    {commodityName} - Detail Analysis
-                </Title>
+                <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center' }}>
+                    <Button
+                        icon={<ArrowLeftOutlined />}
+                        onClick={() => navigate(`/dashboard?session_id=${sessionId}`)}
+                        style={{ marginRight: 16 }}
+                    >
+                        Back to Overview
+                    </Button>
+                    <Title level={2} style={{ margin: 0 }}>
+                        {commodityName} - Detail Analysis
+                    </Title>
+                </div>
 
                 {loading ? (
                     <Spin size="large" style={{ display: 'block', margin: '100px auto' }} />
@@ -116,6 +128,13 @@ export const CommodityDetail: React.FC = () => {
                                 <KPICard title="Gap % of APV" value={kpi?.gap_percent || 0} suffix="%" precision={1} color="#E31837" />
                             </Col>
                         </Row>
+
+                        {/* AI Report */}
+                        <AIReportCard
+                            sessionId={sessionId}
+                            contextType="commodity"
+                            contextValue={commodityName}
+                        />
 
                         {/* 2. Top 5 Suppliers Chart */}
                         <Card title="Top 5 Suppliers (by Opportunity)" style={{ marginBottom: 24 }}>
