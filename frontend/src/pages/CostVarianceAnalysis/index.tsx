@@ -208,6 +208,7 @@ export const CostVarianceAnalysis: React.FC = () => {
                                         title="Part Number"
                                         value={currentSession.part_number}
                                         valueStyle={{ fontSize: 18 }}
+                                        formatter={(value) => value} // 直接显示字符串，不进行数值格式化
                                     />
                                     <div style={{ fontSize: 12, color: '#666', marginTop: 8 }}>
                                         {currentSession.part_description}
