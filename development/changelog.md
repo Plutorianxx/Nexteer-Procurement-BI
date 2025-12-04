@@ -13,6 +13,9 @@
 - `feat`: 支持 .xlsm 格式的Excel文件上传
 - `fix`: 修复数据库主键冲突问题，使用MD5哈希生成唯一ID
 - `feat`: Dashboard集成成本差异分析入口
+- `style`: 重构 Cost Tree 为 Gap Analysis 风格树形条形图
+- `style`: 优化瀑布图为阶梯式显示，直观展示差异路径
+- `style`: 优化布局结构，自动隐藏无差异的成本项
 
 ### 12-03
 - `feat`: 新增 Excel 数据导出功能，支持 Dashboard 和 Commodity Detail 的完整数据导出
