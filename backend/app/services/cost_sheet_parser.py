@@ -124,15 +124,26 @@ class CostSheetParser:
             if i + 12 > df.shape[0]:  # 防止越界
                 break
             
-            # 第1行: 材料描述 (相对偏移0)
-            mat_desc = self._safe_get(df, i, self.cols['label'])
+            # E列: 基础描述 (用于判断是否为空行)
+            base_desc = self._safe_get(df, i, self.cols['label'])
+            
+            # H列: Regional值
+            regional_val = self._safe_get(df, i, self.cols['target'])
+            # I列: Supplier值
+            supplier_val = self._safe_get(df, i, self.cols['actual'])
+            
+            # 构造新描述
+            if regional_val or supplier_val:
+                mat_desc = f'Regional: "{regional_val}" vs Supplier: "{supplier_val}"'
+            else:
+                mat_desc = base_desc
             
             # 第12行: 材料成本 (相对偏移11)
             target_cost = self._safe_float(df, i + 11, self.cols['target'])
             actual_cost = self._safe_float(df, i + 11, self.cols['actual'])
             
-            # 过滤空行
-            if mat_desc and mat_desc.strip():
+            # 过滤空行 (只要E列有值就认为有效)
+            if base_desc and base_desc.strip():
                 materials.append(MaterialItem(
                     description=mat_desc,
                     target_cost=target_cost,
@@ -155,14 +166,23 @@ class CostSheetParser:
             if i + 9 > df.shape[0]:
                 break
             
-            # 第1行: 零部件描述
-            comp_desc = self._safe_get(df, i, self.cols['label'])
+            # E列: 基础描述
+            base_desc = self._safe_get(df, i, self.cols['label'])
+            
+            # H列 & I列
+            regional_val = self._safe_get(df, i, self.cols['target'])
+            supplier_val = self._safe_get(df, i, self.cols['actual'])
+            
+            if regional_val or supplier_val:
+                comp_desc = f'Regional: "{regional_val}" vs Supplier: "{supplier_val}"'
+            else:
+                comp_desc = base_desc
             
             # 第9行: 零部件成本
             target_cost = self._safe_float(df, i + 8, self.cols['target'])
             actual_cost = self._safe_float(df, i + 8, self.cols['actual'])
             
-            if comp_desc and comp_desc.strip():
+            if base_desc and base_desc.strip():
                 components.append(ComponentItem(
                     description=comp_desc,
                     target_cost=target_cost,
@@ -190,8 +210,17 @@ class CostSheetParser:
             if i + 23 > df.shape[0]:
                 break
             
-            # 第6行: 工序描述 (相对偏移5)
-            operation_desc = self._safe_get(df, i + 5, self.cols['label'])
+            # 第6行: 工序描述 (相对偏移5) - E列
+            base_op_desc = self._safe_get(df, i + 5, self.cols['label'])
+            
+            # H列 & I列 (相对偏移5)
+            regional_val = self._safe_get(df, i + 5, self.cols['target'])
+            supplier_val = self._safe_get(df, i + 5, self.cols['actual'])
+            
+            if regional_val or supplier_val:
+                operation_desc = f'Regional: "{regional_val}" vs Supplier: "{supplier_val}"'
+            else:
+                operation_desc = base_op_desc
             
             # 第7行: 设备描述 (相对偏移6)
             equipment_desc = self._safe_get(df, i + 6, self.cols['label'])
@@ -208,7 +237,7 @@ class CostSheetParser:
             burden_target = self._safe_float(df, i + 19, self.cols['target'])
             burden_actual = self._safe_float(df, i + 19, self.cols['actual'])
             
-            if operation_desc and operation_desc.strip():
+            if base_op_desc and base_op_desc.strip():
                 processes.append(ProcessItem(
                     operation_desc=operation_desc,
                     equipment_desc=equipment_desc or "",
