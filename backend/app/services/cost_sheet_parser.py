@@ -133,7 +133,9 @@ class CostSheetParser:
             supplier_val = self._safe_get(df, i, self.cols['actual'])
             
             # 构造新描述
-            if regional_val or supplier_val:
+            if regional_val and supplier_val and regional_val == supplier_val:
+                mat_desc = regional_val
+            elif regional_val or supplier_val:
                 mat_desc = f'Regional: "{regional_val}" vs Supplier: "{supplier_val}"'
             else:
                 mat_desc = base_desc
@@ -173,7 +175,9 @@ class CostSheetParser:
             regional_val = self._safe_get(df, i, self.cols['target'])
             supplier_val = self._safe_get(df, i, self.cols['actual'])
             
-            if regional_val or supplier_val:
+            if regional_val and supplier_val and regional_val == supplier_val:
+                comp_desc = regional_val
+            elif regional_val or supplier_val:
                 comp_desc = f'Regional: "{regional_val}" vs Supplier: "{supplier_val}"'
             else:
                 comp_desc = base_desc
@@ -217,7 +221,9 @@ class CostSheetParser:
             regional_val = self._safe_get(df, i + 5, self.cols['target'])
             supplier_val = self._safe_get(df, i + 5, self.cols['actual'])
             
-            if regional_val or supplier_val:
+            if regional_val and supplier_val and regional_val == supplier_val:
+                operation_desc = regional_val
+            elif regional_val or supplier_val:
                 operation_desc = f'Regional: "{regional_val}" vs Supplier: "{supplier_val}"'
             else:
                 operation_desc = base_op_desc
