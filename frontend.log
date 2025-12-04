@@ -14,3 +14,6 @@ Port 5173 is in use, trying another one...
 1:11:10 PM [vite] (client) hmr update /src/App.tsx
 1:11:10 PM [vite] (client) hmr update /src/App.tsx
 1:11:50 PM [vite] (client) hmr update /src/pages/Dashboard/index.tsx
+2:47:48 PM [vite] (client) hmr update /src/pages/Upload/index.tsx, /src/components/MappingModal.tsx, /src/components/FileUploader.tsx
+2:48:02 PM [vite] (client) hmr update /src/components/FileUploader.tsx
+2:48:15 PM [vite] (client) hmr update /src/components/OpportunityMatrix.tsx

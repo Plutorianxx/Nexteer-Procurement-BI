@@ -148,10 +148,14 @@ export const OpportunityMatrix: React.FC<Props> = ({ data }) => {
                 {
                     type: 'scatter',
                     symbolSize: (data: number[]) => {
-                        const opportunity = data[2];
+                        const opportunity = data[2]; // Index 2 is Opportunity Amount
                         if (opportunity <= 0) return 6;
-                        // 调整气泡大小公式
-                        return Math.sqrt(opportunity) / 10 + 6;
+                        // 使用 sqrt 缩放，确保大金额气泡显著但不过大
+                        // 假设 Opportunity 范围 1k - 1M
+                        // 1k -> sqrt=31 -> size ~8
+                        // 1M -> sqrt=1000 -> size ~55
+                        // 调整系数以获得更好的视觉效果
+                        return Math.sqrt(opportunity) / 20 + 8;
                     },
                     data: bubbleData,
                     emphasis: {

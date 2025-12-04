@@ -37,7 +37,7 @@ export const FileUploader: React.FC<Props> = ({ onUploadSuccess, loading }) => {
     };
 
     return (
-        <Card className="kpi-card" style={{ maxWidth: 800, margin: '0 auto', marginTop: 40 }}>
+        <Card className="kpi-card" style={{ width: '100%', margin: '0 auto', marginTop: 40 }}>
             <div style={{ textAlign: 'center', marginBottom: 24 }}>
                 <Title level={3} style={{ color: '#1A1A1A' }}>{t('upload.title')}</Title>
             </div>
