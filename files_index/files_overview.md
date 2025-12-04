@@ -52,6 +52,22 @@
 - `src/services/analyticsService.ts`: 分析服务
 - `src/types/index.ts`: 基础类型定义
 - `src/types/analytics.ts`: 分析类型定义
+
+### 成本差异分析模块 (Phase 5)
+**后端**:
+- `backend/app/services/cost_sheet_parser.py`: 固定格式成本表解析器
+- `backend/app/services/cost_tree_builder.py`: 成本树构建器（支持双视角）
+- `backend/app/services/cost_variance_service.py`: 成本差异分析服务层
+- `backend/app/routers/cost_variance.py`: 成本差异分析API路由
+- `backend/app/schemas/cost_variance.py`: 成本差异分析数据模型
+
+**前端**:
+- `src/pages/CostVarianceAnalysis/index.tsx`: 成本差异分析主页面
+- `src/components/CostTree.tsx`: 成本树组件
+- `src/components/WaterfallChart.tsx`: 瀑布图组件
+- `src/services/costVarianceService.ts`: 成本差异分析API服务
+- `src/types/costVariance.ts`: 成本差异分析类型定义
+
 - `src/utils/i18n.ts`: 国际化工具
 - `vite.config.ts`: Vite配置
 - `package.json`: 前端依赖

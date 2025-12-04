@@ -50,6 +50,60 @@
 **主键**：`(session_id, pns, supplier)` (支持同一零件由多个供应商供应)  
 **外键**：session_id → sessions.session_id
 
+### part_cost_sessions 成本分析会话表 (Phase 5)
+
+| 字段 | 类型 | 约束 | 说明 |
+|-----|------|------|------|
+| session_id | VARCHAR | PK | 会话唯一标识 (UUID) |
+| part_number | VARCHAR | | 零件号 |
+| part_description | VARCHAR | | 零件描述 |
+| supplier_name | VARCHAR | | 供应商名称 |
+| currency | VARCHAR | | 币种 |
+| target_price | DECIMAL(15,2) | | 目标价格 |
+| supplier_price | DECIMAL(15,2) | | 供应商报价 |
+| total_variance | DECIMAL(15,2) | | 总差异金额 |
+| variance_pct | DECIMAL(5,2) | | 差异百分比 |
+| upload_time | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | 上传时间 |
+| file_name | VARCHAR | | 原始文件名 |
+| file_hash | VARCHAR | | 文件哈希 |
+
+### cost_items 成本树明细表 (Phase 5)
+
+| 字段 | 类型 | 约束 | 说明 |
+|-----|------|------|------|
+| id | BIGINT | PK | 唯一标识 (Hash生成) |
+| session_id | VARCHAR | FK | 关联会话ID |
+| item_id | VARCHAR | | 成本项ID (如 MAT_001) |
+| parent_id | VARCHAR | | 父节点ID |
+| level | INTEGER | | 树层级 (1-5) |
+| category | VARCHAR | | 类别 (Material/Process/etc) |
+| item_name | VARCHAR | | 项目名称 |
+| target_cost | DECIMAL(15,2) | | 目标成本 |
+| actual_cost | DECIMAL(15,2) | | 实际成本 |
+| variance | DECIMAL(15,2) | | 差异金额 |
+| variance_pct | DECIMAL(5,2) | | 差异百分比 |
+| sort_order | INTEGER | | 排序索引 |
+| metadata | JSON | | 额外元数据 |
+
+**外键**：session_id → part_cost_sessions.session_id
+
+### processing_breakdown 加工成本分解表 (Phase 5)
+
+| 字段 | 类型 | 约束 | 说明 |
+|-----|------|------|------|
+| id | BIGINT | PK | 唯一标识 (Hash生成) |
+| session_id | VARCHAR | FK | 关联会话ID |
+| process_id | VARCHAR | | 工序ID |
+| process_desc | VARCHAR | | 工序描述 |
+| setup_cost_target | DECIMAL(15,2) | | 设置成本(目标) |
+| setup_cost_actual | DECIMAL(15,2) | | 设置成本(实际) |
+| labor_cost_target | DECIMAL(15,2) | | 人工成本(目标) |
+| labor_cost_actual | DECIMAL(15,2) | | 人工成本(实际) |
+| burden_cost_target | DECIMAL(15,2) | | 间接成本(目标) |
+| burden_cost_actual | DECIMAL(15,2) | | 间接成本(实际) |
+
+**外键**：session_id → part_cost_sessions.session_id
+
 ## 关系图
 
 ```

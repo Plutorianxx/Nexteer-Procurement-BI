@@ -1,0 +1,16 @@
+
+> frontend@0.0.0 dev
+> vite --host
+
+You are using Node.js 22.11.0. Vite requires Node.js version 20.19+ or 22.12+. Please upgrade your Node.js version.
+Port 5173 is in use, trying another one...
+
+  VITE v7.2.6  ready in 254 ms
+
+  ➜  Local:   http://localhost:5174/
+  ➜  Network: http://10.255.255.254:5174/
+  ➜  Network: http://192.168.2.9:5174/
+  ➜  Network: http://198.18.0.1:5174/
+1:11:10 PM [vite] (client) hmr update /src/App.tsx
+1:11:10 PM [vite] (client) hmr update /src/App.tsx
+1:11:50 PM [vite] (client) hmr update /src/pages/Dashboard/index.tsx

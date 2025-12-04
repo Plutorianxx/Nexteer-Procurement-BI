@@ -281,6 +281,73 @@
 - Content-Type: `text/event-stream`
 - 流式返回 Markdown 文本块
 
+## Cost Variance 模块 (Phase 5)
+
+### POST /api/cost-variance/upload 上传成本明细表
+**认证**：不需要
+**描述**：上传并解析固定格式的成本明细表 (.xlsx/.xls/.xlsm)
+
+| 参数 | 类型 | 必填 | 说明 |
+|-----|------|------|------|
+| file | File | ✅ | 成本明细表文件 |
+
+**响应**：
+```json
+{
+  "session_id": "uuid",
+  "part_number": "12345",
+  "part_description": "Housing",
+  "supplier_name": "Supplier A",
+  "target_price": 100.0,
+  "supplier_price": 105.0,
+  "total_variance": 5.0,
+  "variance_pct": 5.0
+}
+```
+
+### GET /api/cost-variance/tree/{session_id} 获取成本树
+**认证**：不需要
+
+**参数**：
+- `view` (query, optional): 视角 ('by_process' | 'by_type')，默认 'by_process'
+
+**响应**：
+```json
+{
+  "session_id": "uuid",
+  "view": "by_process",
+  "tree": {
+    "item_id": "ROOT",
+    "item_name": "Total Cost",
+    "variance": 5.0,
+    "children": [...]
+  }
+}
+```
+
+### GET /api/cost-variance/sessions 获取历史会话
+**认证**：不需要
+
+**参数**：
+- `limit` (query, optional): 返回数量，默认 10
+
+**响应**：
+```json
+{
+  "sessions": [
+    {
+      "session_id": "uuid",
+      "part_number": "12345",
+      "upload_time": "2023-12-04T12:00:00"
+    }
+  ]
+}
+```
+
+### DELETE /api/cost-variance/session/{session_id} 删除会话
+**认证**：不需要
+**描述**：删除指定会话及其所有关联数据
+
 ## 错误码
 
 | 错误码 | HTTP状态 | 说明 |

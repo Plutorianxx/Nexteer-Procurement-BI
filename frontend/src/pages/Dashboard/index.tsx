@@ -7,9 +7,9 @@ import { ConcentrationChart } from '../../components/ConcentrationChart';
 import { AIReportCard } from '../../components/AIReportCard';
 import { analyticsService } from '../../services/analyticsService';
 import type { KPISummary, CommodityData, SupplierRank, ProjectRank } from '../../types/analytics';
-import { useSearchParams } from 'react-router-dom';
-import { Button, message } from 'antd';
-import { DownloadOutlined } from '@ant-design/icons';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { Button, message, Space } from 'antd';
+import { DownloadOutlined, DollarOutlined } from '@ant-design/icons';
 import { exportDashboardToExcel } from '../../utils/excelExport';
 
 const { Content } = Layout;
@@ -17,7 +17,8 @@ const { Title } = Typography;
 
 export const Dashboard: React.FC = () => {
     const [searchParams] = useSearchParams();
-    // 暂时硬编码 session_id 用于测试，实际应从 URL 或 Context 获取
+    const navigate = useNavigate();
+    // 暂时硬编码 session_id 用于测试，实际应从 URL  或 Context 获取
     // 假设用户上传后跳转带上了 ?session_id=xxx
     const sessionId = searchParams.get('session_id') || 'latest';
 
@@ -92,14 +93,23 @@ export const Dashboard: React.FC = () => {
             <Content style={{ padding: '24px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                     <Title level={2} style={{ margin: 0 }}>Commodity Assessment Overview</Title>
-                    <Button
-                        type="default"
-                        icon={<DownloadOutlined />}
-                        onClick={handleExport}
-                        disabled={loading}
-                    >
-                        Export to Excel
-                    </Button>
+                    <Space>
+                        <Button
+                            type="primary"
+                            icon={<DollarOutlined />}
+                            onClick={() => navigate('/cost-variance')}
+                        >
+                            Cost Variance Analysis
+                        </Button>
+                        <Button
+                            type="default"
+                            icon={<DownloadOutlined />}
+                            onClick={handleExport}
+                            disabled={loading}
+                        >
+                            Export to Excel
+                        </Button>
+                    </Space>
                 </div>
 
                 {loading ? (
