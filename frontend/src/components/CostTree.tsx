@@ -37,8 +37,19 @@ export const CostTree: React.FC<Props> = ({ treeData, onNodeClick }) => {
     };
 
     const renderNode = (node: CostTreeNode): React.ReactNode => {
+        // 过滤掉差异为0的节点 (保留根节点)
+        if (node.level > 1 && Math.abs(node.variance) < 0.001) {
+            return null;
+        }
+
         const isExpanded = expandedNodes.has(node.item_id);
-        const hasChildren = node.children && node.children.length > 0;
+
+        // 过滤子节点：只保留有差异的子节点
+        const visibleChildren = node.children
+            ? node.children.filter(child => Math.abs(child.variance) >= 0.001)
+            : [];
+
+        const hasChildren = visibleChildren.length > 0;
 
         // 计算条形图宽度 (相对于最大值的百分比)
         // 我们预留 50% 给正值，50% 给负值。所以最大宽度是 50%。
@@ -154,7 +165,7 @@ export const CostTree: React.FC<Props> = ({ treeData, onNodeClick }) => {
                 {/* 子节点递归渲染 */}
                 {hasChildren && isExpanded && (
                     <div>
-                        {node.children
+                        {visibleChildren
                             .sort((a, b) => Math.abs(b.variance) - Math.abs(a.variance)) // 按差异绝对值降序排列(Pareto风格)
                             .map(child => renderNode(child))}
                     </div>
