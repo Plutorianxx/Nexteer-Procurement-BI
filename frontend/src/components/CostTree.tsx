@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import type { CostTreeNode } from '../types/costVariance';
+import { PlusSquareOutlined, MinusSquareOutlined } from '@ant-design/icons';
 
 interface Props {
     treeData: CostTreeNode;
@@ -8,6 +9,22 @@ interface Props {
 
 export const CostTree: React.FC<Props> = ({ treeData, onNodeClick }) => {
     const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set(['ROOT']));
+
+    // 计算整个树中差异绝对值的最大值，用于归一化条形图宽度
+    const maxAbsVariance = useMemo(() => {
+        let max = 0;
+        const traverse = (node: CostTreeNode) => {
+            if (Math.abs(node.variance) > max) {
+                max = Math.abs(node.variance);
+            }
+            if (node.children) {
+                node.children.forEach(traverse);
+            }
+        };
+        traverse(treeData);
+        // 如果最大值为0，设为1防止除以0
+        return max === 0 ? 1 : max;
+    }, [treeData]);
 
     const toggleNode = (nodeId: string) => {
         const newExpanded = new Set(expandedNodes);
@@ -23,91 +40,122 @@ export const CostTree: React.FC<Props> = ({ treeData, onNodeClick }) => {
         const isExpanded = expandedNodes.has(node.item_id);
         const hasChildren = node.children && node.children.length > 0;
 
-        // 差异颜色
-        const varianceColor = node.variance > 0 ? '#E31837' : node.variance < 0 ? '#52C41A' : '#8C8C8C';
+        // 计算条形图宽度 (相对于最大值的百分比)
+        // 我们预留 50% 给正值，50% 给负值。所以最大宽度是 50%。
+        const barWidthPct = (Math.abs(node.variance) / maxAbsVariance) * 45; // 留一点padding
 
-        // 差异占比 > 5% 加粗
-        const isBold = Math.abs(node.variance_pct) > 5;
+        const isPositive = node.variance >= 0;
+        const barColor = isPositive ? '#D9363E' : '#52C41A'; // 红色正，绿色负
 
         return (
-            <div key={node.item_id} style={{ marginBottom: 4 }}>
+            <div key={node.item_id}>
                 <div
-                    onClick={() => {
-                        if (hasChildren) toggleNode(node.item_id);
-                        if (onNodeClick) onNodeClick(node);
-                    }}
                     style={{
                         display: 'flex',
-                        justifyContent: 'space-between',
                         alignItems: 'center',
-                        padding: '8px 12px',
-                        paddingLeft: `${(node.level - 1) * 24 + 12}px`,
-                        cursor: hasChildren ? 'pointer' : 'default',
-                        backgroundColor: expandedNodes.has(node.item_id) && hasChildren ? '#F5F5F5' : '#FFF',
-                        borderLeft: node.level === 2 ? '3px solid #E31837' : 'none',
-                        transition: 'background-color 0.2s',
-                        fontWeight: isBold ? 600 : 400,
-                        fontSize: node.level === 1 ? '16px' : node.level === 2 ? '15px' : '14px'
-                    }}
-                    onMouseEnter={(e) => {
-                        if (hasChildren) e.currentTarget.style.backgroundColor = '#FAFAFA';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = expandedNodes.has(node.item_id) && hasChildren ? '#F5F5F5' : '#FFF';
+                        padding: '8px 0',
+                        borderBottom: '1px solid #f0f0f0',
+                        fontSize: '14px'
                     }}
                 >
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        {hasChildren && (
-                            <span style={{
-                                fontSize: '12px',
-                                color: '#666',
-                                transition: 'transform 0.2s',
-                                display: 'inline-block',
-                                transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)'
-                            }}>
-                                ▶
+                    {/* 1. 名称区域 (40%) */}
+                    <div style={{
+                        width: '40%',
+                        paddingLeft: `${(node.level - 1) * 24 + 12}px`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8
+                    }}>
+                        {hasChildren ? (
+                            <span
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleNode(node.item_id);
+                                }}
+                                style={{ cursor: 'pointer', color: '#999', fontSize: 16 }}
+                            >
+                                {isExpanded ? <MinusSquareOutlined /> : <PlusSquareOutlined />}
                             </span>
+                        ) : (
+                            <span style={{ width: 16 }} />
                         )}
-                        {!hasChildren && <span style={{ width: 12 }} />}
-                        <span style={{ color: '#333' }}>{node.item_name}</span>
-                    </span>
+                        <span style={{ fontWeight: node.level === 1 ? 700 : 400 }}>
+                            {node.item_name}
+                        </span>
+                    </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+                    {/* 2. 条形图区域 (40%) - 中心轴布局 */}
+                    <div style={{
+                        width: '40%',
+                        position: 'relative',
+                        height: 24,
+                        display: 'flex',
+                        alignItems: 'center',
+                        borderLeft: '1px dashed #ccc', // 中心轴
+                        marginLeft: '20%' // 稍微偏移一点，让负值有空间
+                    }}>
+                        {/* 负值条 (向左) */}
+                        {!isPositive && (
+                            <div style={{
+                                position: 'absolute',
+                                right: '100%', // 从中心轴向左延伸
+                                height: 16,
+                                width: `${barWidthPct}%`,
+                                backgroundColor: barColor,
+                                borderRadius: '2px 0 0 2px',
+                                transition: 'width 0.3s ease'
+                            }} />
+                        )}
+
+                        {/* 正值条 (向右) */}
+                        {isPositive && (
+                            <div style={{
+                                position: 'absolute',
+                                left: 0, // 从中心轴向右延伸
+                                height: 16,
+                                width: `${barWidthPct}%`,
+                                backgroundColor: barColor,
+                                borderRadius: '0 2px 2px 0',
+                                transition: 'width 0.3s ease'
+                            }} />
+                        )}
+
+                        {/* 数值标注 (跟随条形图) */}
                         <span style={{
-                            fontSize: '13px',
+                            position: 'absolute',
+                            left: isPositive ? `${barWidthPct + 2}%` : 'auto',
+                            right: !isPositive ? `calc(100% + ${barWidthPct + 2}%)` : 'auto',
+                            fontSize: '12px',
                             color: '#666',
-                            minWidth: 100,
-                            textAlign: 'right'
+                            whiteSpace: 'nowrap'
                         }}>
-                            Target: ${node.target_cost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            {node.variance > 0 ? '+' : ''}{node.variance.toFixed(3)}
                         </span>
-                        <span style={{
-                            fontSize: '13px',
-                            color: '#666',
-                            minWidth: 100,
-                            textAlign: 'right'
-                        }}>
-                            Actual: ${node.actual_cost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </div>
+
+                    {/* 3. 详情数值区域 (20%) */}
+                    <div style={{
+                        width: '20%',
+                        textAlign: 'right',
+                        paddingRight: 24,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center'
+                    }}>
+                        <span style={{ fontWeight: 600, color: barColor }}>
+                            {node.variance > 0 ? '+' : ''}{node.variance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
-                        <span style={{
-                            color: varianceColor,
-                            fontSize: '14px',
-                            fontWeight: 600,
-                            minWidth: 120,
-                            textAlign: 'right'
-                        }}>
-                            {node.variance > 0 ? '+' : ''}${node.variance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                            <span style={{ fontSize: '12px', marginLeft: 4 }}>
-                                ({node.variance_pct > 0 ? '+' : ''}{node.variance_pct.toFixed(2)}%)
-                            </span>
+                        <span style={{ fontSize: 12, color: '#999' }}>
+                            {node.variance_pct > 0 ? '+' : ''}{node.variance_pct.toFixed(2)}%
                         </span>
                     </div>
                 </div>
 
+                {/* 子节点递归渲染 */}
                 {hasChildren && isExpanded && (
                     <div>
                         {node.children
-                            .sort((a, b) => a.sort_order - b.sort_order)
+                            .sort((a, b) => Math.abs(b.variance) - Math.abs(a.variance)) // 按差异绝对值降序排列(Pareto风格)
                             .map(child => renderNode(child))}
                     </div>
                 )}
@@ -117,31 +165,26 @@ export const CostTree: React.FC<Props> = ({ treeData, onNodeClick }) => {
 
     return (
         <div style={{
-            border: '1px solid #E0E0E0',
-            borderRadius: 4,
-            backgroundColor: '#FFF'
+            backgroundColor: '#FFF',
+            borderRadius: 8,
+            padding: '16px 0'
         }}>
-            {/* 表头 */}
+            {/* Header */}
             <div style={{
                 display: 'flex',
-                justifyContent: 'space-between',
-                padding: '12px',
-                backgroundColor: '#FAFAFA',
-                borderBottom: '1px solid #E0E0E0',
+                padding: '0 0 12px 0',
+                borderBottom: '2px solid #f0f0f0',
                 fontWeight: 600,
-                fontSize: '13px',
-                color: '#666'
+                color: '#333',
+                fontSize: 14
             }}>
-                <span>Cost Item</span>
-                <div style={{ display: 'flex', gap: 24 }}>
-                    <span style={{ minWidth: 100, textAlign: 'right' }}>Target Cost</span>
-                    <span style={{ minWidth: 100, textAlign: 'right' }}>Actual Cost</span>
-                    <span style={{ minWidth: 120, textAlign: 'right' }}>Variance</span>
-                </div>
+                <div style={{ width: '40%', paddingLeft: 12 }}>Cost Item</div>
+                <div style={{ width: '40%', textAlign: 'center' }}>Gap Impact</div>
+                <div style={{ width: '20%', textAlign: 'right', paddingRight: 24 }}>Variance / %</div>
             </div>
 
-            {/* 树内容 */}
-            <div style={{ maxHeight: 600, overflowY: 'auto' }}>
+            {/* Tree Content */}
+            <div style={{ maxHeight: 800, overflowY: 'auto' }}>
                 {renderNode(treeData)}
             </div>
         </div>

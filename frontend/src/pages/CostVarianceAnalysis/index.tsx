@@ -254,27 +254,25 @@ export const CostVarianceAnalysis: React.FC = () => {
                         </Row>
 
                         {/* 成本树 + 瀑布图 */}
-                        <Row gutter={16}>
-                            <Col span={14}>
-                                <Card
-                                    title="Cost Breakdown Tree"
-                                    extra={
-                                        <Radio.Group value={view} onChange={(e) => handleViewChange(e.target.value)}>
-                                            <Radio.Button value="by_process">By Process</Radio.Button>
-                                            <Radio.Button value="by_type">By Type</Radio.Button>
-                                        </Radio.Group>
-                                    }
-                                >
-                                    {treeData && <CostTree treeData={treeData} />}
-                                </Card>
-                            </Col>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                            {/* Cost Breakdown Tree (Full Width) */}
+                            <Card
+                                title="Cost Breakdown Tree"
+                                extra={
+                                    <Radio.Group value={view} onChange={(e) => handleViewChange(e.target.value)}>
+                                        <Radio.Button value="by_process">By Process</Radio.Button>
+                                        <Radio.Button value="by_type">By Type</Radio.Button>
+                                    </Radio.Group>
+                                }
+                            >
+                                {treeData && <CostTree treeData={treeData} />}
+                            </Card>
 
-                            <Col span={10}>
-                                <Card title="Variance Waterfall">
-                                    {treeData && <WaterfallChart treeData={treeData} />}
-                                </Card>
-                            </Col>
-                        </Row>
+                            {/* Variance Waterfall (Full Width) */}
+                            <Card title="Variance Waterfall">
+                                {treeData && <WaterfallChart treeData={treeData} />}
+                            </Card>
+                        </div>
 
                         {/* Export Buttons */}
                         <div style={{ marginTop: 24, textAlign: 'center' }}>
